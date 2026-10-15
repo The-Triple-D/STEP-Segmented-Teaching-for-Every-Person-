@@ -1,1 +1,260 @@
+Requirements
+Project: STEP – Segmented Teaching for Every Person Course: Applications Development and Emerging Technologies Status: Draft for Sprint 1
 
+1. Overview
+STEP is a web-based learning platform, designed to work alongside an existing LMS, that turns long lecture videos and text-heavy PDFs into short, interactive, accessible micro-lessons. It is designed for college students who struggle to stay focused, including students with ADHD, and every feature is available to every student without a diagnosis or accommodation request.
+
+Problem
+Traditional LMS courses rely on static, text-heavy PDFs and long lecture videos. This causes lost focus, digital fatigue, and poor retention. The interactive tools that could help often lack basic accessibility such as screen reader support and keyboard navigation, or add time pressure and distraction, so students with disabilities and learning differences cannot take part fully.
+
+Users
+User	Needs
+Student (primary)	Short lessons, one clear next step, immediate calm feedback, a choice of formats, accessibility from the start, no disclosure required
+Instructor	A simple way to turn existing videos and PDFs into short lessons, write check-in questions, and see where students drop off
+Core use cases
+An instructor uploads a video or PDF, reviews the suggested segments, adds check-in questions, and publishes the lesson.
+A student enrolls in a course, studies a lesson one segment at a time, answers a quick question after each, and resumes later exactly where they stopped.
+A student switches between watching, listening, and reading, and saves display preferences that apply to every course.
+A student sees quiet progress (streaks, effort points, badges) without timers or public competition.
+2. Epics and Features
+6 epics, 17 features. Priorities use MoSCoW: Must = MVP, Should = planned after MVP, Could = if time allows.
+
+Epic	ID	Feature	Priority	Depends on
+E1 Accounts & Enrollment	ACC-01	Account registration and login	Must	none
+ACC-02	Course enrollment	Must	ACC-01
+E2 Content & Lessons	CNT-01	Semi-automatic content chunking	Must	ACC-01
+CNT-02	PDF study tools (flashcards, "read more")	Should	CNT-01
+CNT-03	Visual summaries	Could	CNT-01, ACS-03
+E3 Interactive Learning	INT-01	Check-in questions with immediate feedback	Must	CNT-01, ACC-02
+INT-02	Resume where you left off	Must	PRG-01
+INT-03	Spaced review questions	Could	INT-01, PRG-01
+E4 Accessibility & Multimodal Access	ACS-01	Captions and searchable transcripts	Must	CNT-01
+ACS-02	WCAG 2.1 AA-aligned interface	Must	none (applies to all UI)
+ACS-03	Multimodal alternatives (text-to-speech, text version, playback speed)	Should	CNT-01, ACS-02
+ACS-04	Low-stimulation mode	Should	ACS-05
+ACS-05	Saved universal preferences	Should	ACC-01
+E5 Progress & Motivation	PRG-01	Automatic progress tracking and personal dashboard	Must	ACC-02, INT-01
+PRG-02	Calm gamification (streaks, effort points, badges)	Should	PRG-01, ACS-04
+PRG-03	In-app reminders	Could	PRG-01
+E6 Instructor Insights	INS-01	Instructor drop-off dashboard	Could	PRG-01
+3. Feature Details
+E1 Accounts & Enrollment
+ACC-01 Account registration and login (Must)
+User story: As a student or instructor, I want to create an account and log in, so that my courses and progress belong to me.
+
+Acceptance criteria
+
+[ ] A user can register with a name, email, and password.
+[ ] Passwords must be at least 8 characters and are never stored in plain text.
+[ ] A duplicate email is rejected, and emails are not case-sensitive.
+[ ] A wrong email and a wrong password show the same error message.
+[ ] Sign-up never asks about a diagnosis or disability.
+Dependencies: none
+
+ACC-02 Course enrollment (Must)
+User story: As a student, I want to enroll in a course, so that I can study its lessons.
+
+Acceptance criteria
+
+[ ] A student can enroll in a course once, and a duplicate enrollment is rejected.
+[ ] A student can drop a course they are enrolled in.
+[ ] Enrolled courses appear on the student's dashboard.
+[ ] An instructor can see the roster of a course.
+Dependencies: ACC-01
+
+E2 Content & Lessons
+CNT-01 Semi-automatic content chunking (Must)
+User story: As an instructor, I want the system to suggest short segments from my video or PDF, so that I can turn long content into bite-sized lessons without splitting it by hand.
+
+Acceptance criteria
+
+[ ] An instructor can upload a video lesson (with a transcript or caption file) or a PDF lesson (with its extracted text).
+[ ] The system suggests segments of about 250 words, using the transcript for videos and the text for PDFs.
+[ ] Breaks fall only at sentence ends, and a manual break that would cut a sentence is rejected.
+[ ] The instructor can move break points and must confirm the segments before publishing.
+[ ] Each segment shows its estimated length (real duration for video, reading time for text).
+[ ] Nothing is saved until the instructor confirms.
+Dependencies: ACC-01
+
+CNT-02 PDF study tools (Should)
+User story: As a student studying a PDF lesson, I want flashcards and expandable details, so that I can review key ideas without rereading everything.
+
+Acceptance criteria
+
+[ ] An instructor can add flashcards (front and back) to a PDF card.
+[ ] Flashcards flip using the mouse and the keyboard.
+[ ] "Read more" sections open and close with the keyboard, and screen readers announce their state.
+Dependencies: CNT-01
+
+CNT-03 Visual summaries (Could)
+User story: As a student who learns visually, I want a diagram or infographic of the lesson, so that I can understand it without dense text.
+
+Acceptance criteria
+
+[ ] An instructor can attach an image (diagram, mind map, or infographic) to a lesson.
+[ ] Alt text is required before the image can be saved.
+[ ] The visual summary appears as a third format option for the student.
+Dependencies: CNT-01, ACS-03
+
+E3 Interactive Learning
+INT-01 Check-in questions with immediate feedback (Must)
+User story: As a student, I want a quick question at the end of each segment with instant feedback, so that I can check my understanding and remember more.
+
+Acceptance criteria
+
+[ ] Each segment has at most one question with 2 to 4 answer options, written by the instructor.
+[ ] A video lesson cannot be published unless every segment has a question.
+[ ] Feedback appears immediately, uses calm wording, and shows the correct answer and an explanation.
+[ ] There is no timer, score, or penalty, and the student can retry.
+[ ] Only an enrolled student can answer, and only on a published lesson.
+[ ] The correct answer is not sent to the student before they answer.
+[ ] The question can be answered by keyboard and is announced by screen readers.
+Dependencies: CNT-01, ACC-02
+
+INT-02 Resume where you left off (Must)
+User story: As a student with limited time, I want to resume exactly where I stopped, so that I never lose my place.
+
+Acceptance criteria
+
+[ ] Leaving a lesson saves the student's position.
+[ ] Reopening the lesson, even after logging out and back in, returns to the same place.
+[ ] The dashboard shows a single "Continue" action for the next step.
+Dependencies: PRG-01
+
+INT-03 Spaced review questions (Could)
+User story: As a student, I want old questions to come back over time, so that I remember what I learned.
+
+Acceptance criteria
+
+[ ] Questions from earlier lessons reappear after set intervals.
+[ ] A student can skip a review without any penalty or lost streak.
+[ ] Review results are private.
+Dependencies: INT-01, PRG-01
+
+E4 Accessibility & Multimodal Access
+ACS-01 Captions and searchable transcripts (Must)
+User story: As a student who is deaf, hard of hearing, or sensitive to sound, I want captions and a searchable transcript, so that I can follow a video without relying on audio.
+
+Acceptance criteria
+
+[ ] Captions show by default, using the caption file supplied with the lesson, and can be turned off.
+[ ] A transcript panel is shown next to the video.
+[ ] A search box filters the transcript.
+[ ] Clicking a transcript line jumps the video to that time.
+Dependencies: CNT-01
+
+ACS-02 WCAG 2.1 AA-aligned interface (Must)
+User story: As a student who uses a keyboard or screen reader, I want every feature to work for me from the start, so that I can take part fully.
+
+Acceptance criteria
+
+[ ] Every function works with the keyboard alone, with a visible focus indicator and no keyboard traps.
+[ ] Controls, images, and form fields have accessible names and labels.
+[ ] Text contrast is at least 4.5:1 (3:1 for large text and UI components), and meaning never depends on color alone.
+[ ] Text can be enlarged to 200% without losing content or function.
+[ ] Nothing flashes.
+[ ] Verified with Lighthouse, axe, and a keyboard-only walkthrough, with the results recorded.
+Dependencies: none (applies to all interface work)
+
+ACS-03 Multimodal alternatives (Should)
+User story: As a student who finds audio or dense text hard to process, I want to switch between watching, listening, and reading, so that I can learn in the way that suits me.
+
+Acceptance criteria
+
+[ ] A student can switch between formats in one click, at any point in a lesson.
+[ ] Text-to-speech reads the instructor-written text version, with play, pause, and speed controls.
+[ ] Video playback speed is adjustable.
+[ ] Audio is never required to finish a lesson.
+Dependencies: CNT-01, ACS-02
+
+ACS-04 Low-stimulation mode (Should)
+User story: As a student who is easily overwhelmed, I want to turn off animations and sounds, so that I can concentrate.
+
+Acceptance criteria
+
+[ ] One toggle disables all animations and interface sound effects.
+[ ] The setting respects the operating system's "reduce motion" preference.
+[ ] The setting is saved.
+Dependencies: ACS-05
+
+ACS-05 Saved universal preferences (Should)
+User story: As a student, I want my display and format settings remembered in every course, so that I never have to ask for an accommodation.
+
+Acceptance criteria
+
+[ ] A student can set font size, spacing, contrast, and preferred lesson format.
+[ ] Preferences apply to all of the student's courses and take effect immediately.
+[ ] Preferences are private and need no approval or disclosure.
+Dependencies: ACC-01
+
+E5 Progress & Motivation
+PRG-01 Automatic progress tracking and personal dashboard (Must)
+User story: As a student, I want to see how far I have come and what to do next, so that I stay motivated.
+
+Acceptance criteria
+
+[ ] Finishing a segment and answering its question is recorded automatically.
+[ ] The dashboard shows each enrolled course with its percent complete.
+[ ] The dashboard shows one clear next step.
+[ ] Progress is kept between sessions.
+Dependencies: ACC-02, INT-01
+
+PRG-02 Calm gamification (Should)
+User story: As a student, I want quiet rewards for consistency, so that I stay motivated without pressure.
+
+Acceptance criteria
+
+[ ] A streak counts consecutive days with activity.
+[ ] Effort points reward completing segments, not speed.
+[ ] Simple badges mark consistency milestones.
+[ ] There are no countdown timers, leaderboards, or flashing effects.
+[ ] A broken streak shows a neutral, welcoming message.
+Dependencies: PRG-01, ACS-04
+
+PRG-03 In-app reminders (Could)
+User story: As a student who forgets to return, I want a gentle reminder about unfinished lessons, so that I keep going.
+
+Acceptance criteria
+
+[ ] A banner lists unfinished lessons.
+[ ] The student controls how often reminders appear and can turn them off.
+[ ] Reminders never use countdowns or urgent wording.
+Dependencies: PRG-01
+
+E6 Instructor Insights
+INS-01 Instructor drop-off dashboard (Could)
+User story: As an instructor, I want to see where students stop, so that I can shorten or fix confusing content.
+
+Acceptance criteria
+
+[ ] The dashboard shows how many students completed each segment of a lesson.
+[ ] Individual students are not identified.
+[ ] The segment with the largest drop is highlighted.
+Dependencies: PRG-01
+
+4. MVP Scope
+The first working release includes every Must feature, which together let an instructor publish a chunked lesson and a student complete it:
+
+Order	Feature	Why it is essential
+1	ACC-01 Accounts	Everything else needs a signed-in user
+2	ACC-02 Enrollment	Connects students to courses
+3	CNT-01 Chunking	The core idea of the product
+4	INT-01 Check-in questions	Turns viewing into active recall
+5	ACS-01 Captions and transcripts	Accessibility for video
+6	ACS-02 WCAG-aligned interface	Accessibility is not an add-on
+7	PRG-01 Progress tracking	Powers the dashboard
+8	INT-02 Resume	Depends on progress tracking
+Should features follow once the MVP works end to end. Could features are stretch goals.
+
+5. Out of Scope for This Release (Won't)
+A true LMS plug-in (for example Moodle or Canvas). A possible future path is LTI integration.
+Automatically generated captions, transcripts, summaries, or flashcards. Instructors supply them.
+Push or email notifications. Reminders are in-app only.
+Leaderboards, countdown timers, and any public competition.
+Any question about a student's diagnosis or disability.
+6. Assumptions and Constraints
+STEP is a standalone web application that works alongside an LMS, not inside one.
+Video lessons need a transcript or caption file from the instructor. Chunking depends on it.
+The 250-word target is a default that an instructor can change.
+"WCAG-aligned" means the interface is designed and tested against WCAG 2.1 Level AA, not formally certified.
+Sign-in and storage are course-project grade. A production version would use a dedicated authentication provider and a real database.
