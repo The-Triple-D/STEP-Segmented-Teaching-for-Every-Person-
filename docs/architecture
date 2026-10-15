@@ -1,1 +1,196 @@
+# Architecture
+
+**Project:** STEP – Segmented Teaching for Every Person
+**Status:** Draft. Items marked *planned* are not built yet.
+
+## 1. System Context
+
+STEP is a standalone web application that works alongside an existing LMS. An instructor can link a course page in the LMS to STEP, and students study there. It is not an LMS plug-in. A future path is LTI integration, which would let STEP be launched from inside Moodle, Canvas, or Blackboard.
+
+| Actor | What they do in STEP |
+|---|---|
+| Instructor | Uploads lessons, adjusts and confirms segments, writes check-in questions, publishes, and views drop-off counts |
+| Student | Enrolls, studies one segment at a time, answers check-in questions, switches formats, saves preferences, and tracks progress |
+
+## 2. Layers
+
+```mermaid
+flowchart TB
+  UI["Web interface: student and instructor screens (planned)"] --> S["Service layer: business rules and validation"]
+  S --> R["Repository layer: save, find, delete"]
+  R --> D[("Data store: in-memory now, database later")]
+```
+
+| Layer | Responsibility | Location |
+|---|---|---|
+| Interface | Screens and accessibility behavior. Calls services only. | *planned* |
+| Service | Business rules, validation, and workflows. One service class per entity. | `src/app/service` |
+| Model | Plain data records shared by the services | `src/app/model` |
+| Data | Repositories that store and retrieve records. Swappable for JDBC, JPA, or Firebase. | `src/app/data` |
+
+## 3. Technology Stack
+
+| Area | Choice | Status |
+|---|---|---|
+| Service layer | Java 17 or newer (records, standard library only) | In progress |
+| Password hashing | PBKDF2 with a random salt, from the JDK | In progress |
+| Data store | In-memory repositories now, relational database later (for example MySQL) | In-memory done, database *planned* |
+| Web interface | To be confirmed by the team | *planned* |
+| Accessibility checks | Lighthouse, axe, keyboard-only walkthrough | *planned* |
+| Text-to-speech | Browser Web Speech API | *planned* |
+| Version control | GitHub (private repository) | In progress |
+| Task board | Trello | See README |
+
+## 4. Data Model
+
+```mermaid
+erDiagram
+  INSTRUCTOR ||--o{ COURSE : teaches
+  STUDENT ||--o{ ENROLLMENT : makes
+  COURSE ||--o{ ENROLLMENT : has
+  COURSE ||--o{ LESSON : contains
+  LESSON ||--|{ SEGMENT : split_into
+  LESSON ||--o{ LESSON_FORMAT : offers
+  SEGMENT ||--o| CHECK_IN_QUESTION : ends_with
+  STUDENT ||--o{ PROGRESS : records
+  SEGMENT ||--o{ PROGRESS : tracked_in
+  STUDENT ||--o{ ACHIEVEMENT : earns
+  STUDENT ||--|| PREFERENCE : has
+```
+
+| Entity | Meaning |
+|---|---|
+| INSTRUCTOR, STUDENT | Account holders |
+| COURSE | A course taught by one instructor |
+| ENROLLMENT | Links a student to a course. It resolves the many-to-many between them. |
+| LESSON | A video or PDF lesson in a course |
+| SEGMENT | A short piece of a lesson (about 250 words), at least one per lesson |
+| LESSON_FORMAT | Transcript, instructor-written text version, or visual summary of a lesson |
+| CHECK_IN_QUESTION | The question at the end of a segment, with its options, answer, and explanation |
+| PROGRESS | A student's result on a segment: completion, resume position, and check-in result |
+| ACHIEVEMENT | Streaks and badges |
+| PREFERENCE | One saved set of display and format settings per student |
+
+### Cardinalities
+
+| Entity A | Relationship | Entity B | A to B |
+|---|---|---|---|
+| INSTRUCTOR | teaches | COURSE | 1 to 0..N |
+| STUDENT | makes | ENROLLMENT | 1 to 0..N |
+| COURSE | has | ENROLLMENT | 1 to 0..N |
+| COURSE | contains | LESSON | 1 to 0..N |
+| LESSON | split into | SEGMENT | 1 to 1..N |
+| LESSON | offers | LESSON_FORMAT | 1 to 0..N |
+| SEGMENT | ends with | CHECK_IN_QUESTION | 1 to 0..1 |
+| STUDENT | records | PROGRESS | 1 to 0..N |
+| SEGMENT | tracked in | PROGRESS | 1 to 0..N |
+| STUDENT | earns | ACHIEVEMENT | 1 to 0..N |
+| STUDENT | has | PREFERENCE | 1 to 1 |
+
+**Modeling notes**
+- Each course has one instructor. Co-instructors would need an extra link entity.
+- A check-in question stores its own answer options, so there is no separate options entity.
+- Flashcards and expandable details are part of a segment's content.
+- Points and the instructor drop-off counts are calculated from PROGRESS, so they need no entity of their own.
+- Audio comes from the text version through text-to-speech at runtime, so it needs no entity.
+
+## 5. Service Classes
+
+One service class per entity. Services are the only place business rules live.
+
+| Service | Operations | Status |
+|---|---|---|
+| `InstructorService` | `register`, `login`, `getCourses` | Work-In-Progress |
+| `StudentService` | `register`, `login`, `getDashboard` | Work-In-Progress |
+| `EnrollmentService` | `enroll`, `drop`, `isEnrolled`, `getEnrollments`, `getRoster` | Work-In-Progress |
+| `LessonService` | `uploadLesson`, `publishLesson`, `getLesson`, `listLessons` | Work-In-Progress |
+| `SegmentService` | `suggestSegments`, `adjustBreakPoints`, `confirmSegments`, `getSegments`, `getEstimatedLength` | Work-In-Progress |
+| `CheckInQuestionService` | `createQuestion`, `updateQuestion`, `deleteQuestion`, `getQuestionsForLesson`, `getQuestionForSegment`, `submitAnswer` | Work-In-Progress |
+| `ProgressService` | `saveResumePoint`, `markComplete`, `getStudentProgress`, `getDropOffCounts` | *Planned* |
+| `LessonFormatService` | `attachTranscript`, `attachTextVersion`, `attachVisualSummary`, `searchTranscript` | *Planned* |
+| `AchievementService` | `updateStreak`, `awardBadge`, `getAchievements` | *Planned* |
+| `PreferenceService` | `savePreferences`, `getPreferences`, `setLowStimulation` | *Planned* |
+
+`Credentials` is a small shared helper for sign-up checks and password hashing.
+
+## 6. Key Workflow: Publishing a Lesson
+
+```mermaid
+flowchart LR
+  A[Instructor uploads video or PDF] --> B[System suggests segments of about 250 words]
+  B --> C[Instructor adjusts break points]
+  C --> D[Instructor confirms segments]
+  D --> E[Instructor writes check-in questions]
+  E --> F{Video lesson: every segment has a question?}
+  F -- No --> E
+  F -- Yes --> G[Publish lesson]
+  G --> H[Enrolled students study, answer, and resume]
+```
+
+## 7. Business Rules
+
+| Area | Rule |
+|---|---|
+| Chunking | Suggestions target about 250 words (the default can be changed) and break only at sentence ends. A leftover shorter than 30% of the target joins the previous segment. |
+| Chunking | Nothing is saved until the instructor confirms. Confirming again replaces the old segments and their questions. |
+| Chunking | A published lesson cannot be re-segmented. |
+| Estimated length | Video segments use real duration. Text uses 200 words per minute. |
+| Publishing | A lesson needs confirmed segments. A video lesson also needs a check-in question on every segment. |
+| Check-in question | One per segment, with 2 to 4 distinct options and a valid correct answer. |
+| Check-in question | A video question cannot be deleted once the lesson is published. |
+| Answering | The student must be enrolled and the lesson published. Options keep a fixed order, with no timer, score, or penalty, and the student can retry. |
+| Enrollment | A student can enroll in a course only once. |
+| Accounts | Passwords are at least 8 characters and are hashed with a salt. Emails are not case-sensitive. A failed login gives the same message for a wrong email or password. |
+
+## 8. Accessibility Approach
+
+Accessibility is a design rule for every screen, not a separate feature. The interface is designed to align with WCAG 2.1 Level AA.
+
+- **Keyboard:** every action works without a mouse, with visible focus and a logical order.
+- **Screen readers:** semantic HTML, labeled controls, and live announcements for check-in feedback and progress changes.
+- **Visual:** sufficient contrast, adjustable text size and spacing, and no content that depends on color alone.
+- **Motion and sound:** nothing flashes, and a low-stimulation mode turns off animation and sound effects.
+- **Media:** captions on by default, a searchable transcript, and a text alternative for every video.
+- **No time pressure:** no timers or countdowns anywhere.
+- **Verification:** Lighthouse, axe, and a keyboard-only walkthrough, with results recorded in each pull request.
+
+## 9. Security and Privacy
+
+- Real secrets are never committed. `.env` is ignored, and `.env.example` holds placeholders only.
+- Passwords are stored as PBKDF2 hashes with a random salt and compared in constant time.
+- The student view of a question never includes the correct answer.
+- Preferences and progress are private to the student. The instructor dashboard shows counts only and never identifies individuals.
+- The system never asks about a diagnosis or disability.
+- Sign-in and in-memory storage are course-project grade. A production version would use a dedicated authentication provider and a managed database.
+
+## 10. Repository Layout
+
+```text
+.
+├── README.md
+├── CONTRIBUTING.md
+├── .gitignore
+├── .env.example
+├── docs/
+│   ├── requirements.md
+│   ├── architecture.md
+│   └── team-roles.md
+├── src/
+│   └── app/
+│       ├── model/      records shared by the services
+│       ├── data/       repositories
+│       └── service/    one service class per entity
+└── tests/              automated checks (planned)
+```
+
+## 11. Design Decisions
+
+| Decision | Reason |
+|---|---|
+| Standalone app alongside an LMS, not a plug-in | A true plug-in needs a specific LMS and its admin access, which is beyond the scope of the course |
+| Semi-automatic chunking | The system suggests and the instructor confirms, which is reliable, keeps the instructor in control, and avoids needing AI |
+| Instructor-supplied captions and text versions | Automatic captioning and summarizing are out of scope and need paid services |
+| Services take a shared database object | Storage can change from in-memory to a real database without touching the rules |
+| No diagnosis or disclosure anywhere | Many students never register for formal support, so features must work for everyone |
+| Calm feedback with no scoring | Pressure and penalties work against focus and follow-through |
 
