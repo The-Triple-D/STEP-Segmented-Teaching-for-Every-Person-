@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -20,6 +21,7 @@ public class CourseEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id; 
     private String instructorId; // String muna
+    @NotBlank(message = "Title is required")
     private String title;
     private String description;
 

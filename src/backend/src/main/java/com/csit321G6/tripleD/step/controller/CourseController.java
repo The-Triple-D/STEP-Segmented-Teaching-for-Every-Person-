@@ -2,6 +2,7 @@ package com.csit321G6.tripleD.step.controller;
 
 import java.util.List;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,7 +31,7 @@ public class CourseController {
     }
     
     @PostMapping("/postNewCourse")
-    public CourseEntity postCourse(@RequestBody CourseEntity course) {
+    public CourseEntity postCourse(@Valid @RequestBody CourseEntity course) {
         return cserv.createCourse(course);
     }
 
