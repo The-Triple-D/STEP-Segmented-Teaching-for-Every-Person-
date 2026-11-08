@@ -3,6 +3,7 @@ package com.csit321G6.tripleD.step.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,7 +19,7 @@ import com.csit321G6.tripleD.step.service.LessonFormatService;
 
 @RestController
 @RequestMapping("/lessonformat/api")
-// @CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "*")
 public class LessonFormatController {
 
     @Autowired
@@ -34,6 +35,16 @@ public class LessonFormatController {
         return fserv.getFormatsByLesson(lessonId);
     }
 
+    @GetMapping("/getAllFormats")
+    public List<LessonFormatEntity> getAllFormats() {
+        return fserv.getAllFormats();
+    }
+
+    @GetMapping("/getFormat/{id}")
+    public LessonFormatEntity getFormat(@PathVariable String id) {
+        return fserv.getFormatById(id);
+    }
+
     @PutMapping("/putFormat")
     public LessonFormatEntity putFormat(@RequestParam String id, @RequestBody LessonFormatEntity newFormatDetails) {
         return fserv.updateFormat(id, newFormatDetails);
@@ -41,7 +52,6 @@ public class LessonFormatController {
 
     @DeleteMapping("/deleteFormat/{id}")
     public String deleteFormat(@PathVariable String id) {
-        fserv.deleteFormat(id);
-        return "Lesson Format " + id + " is successfully deleted!";
+        return fserv.deleteFormat(id);
     }
 }

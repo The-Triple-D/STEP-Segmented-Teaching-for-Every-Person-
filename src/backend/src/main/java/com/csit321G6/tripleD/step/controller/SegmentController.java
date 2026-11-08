@@ -3,6 +3,7 @@ package com.csit321G6.tripleD.step.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,7 +19,7 @@ import com.csit321G6.tripleD.step.service.SegmentService;
 
 @RestController
 @RequestMapping("/segment/api")
-// @CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "*")
 public class SegmentController {
 
     @Autowired
@@ -34,6 +35,16 @@ public class SegmentController {
         return sserv.getSegmentsByLesson(lessonId);
     }
 
+    @GetMapping("/getAllSegments")
+    public List<SegmentEntity> getAllSegments() {
+        return sserv.getAllSegments();
+    }
+
+    @GetMapping("/getSegment/{id}")
+    public SegmentEntity getSegment(@PathVariable String id) {
+        return sserv.getSegmentById(id);
+    }
+
     @PutMapping("/putSegment")
     public SegmentEntity putSegment(@RequestParam String id, @RequestBody SegmentEntity newSegmentDetails) {
         return sserv.updateSegment(id, newSegmentDetails);
@@ -41,7 +52,6 @@ public class SegmentController {
 
     @DeleteMapping("/deleteSegment/{id}")
     public String deleteSegment(@PathVariable String id) {
-        sserv.deleteSegment(id);
-        return "Segment " + id + " is successfully deleted!";
+        return sserv.deleteSegment(id);
     }
 }
