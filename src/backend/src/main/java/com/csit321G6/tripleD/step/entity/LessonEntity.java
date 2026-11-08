@@ -1,16 +1,29 @@
 package com.csit321G6.tripleD.step.entity;
 
 import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "lessons")
 public class LessonEntity {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private String id; 
+    private String id;
 
     @ManyToOne
     @JoinColumn(name = "course_id", nullable = false)
@@ -18,8 +31,13 @@ public class LessonEntity {
     private CourseEntity course;
 
     private String title;
-    private String status;
-    private String sourceType;
+
+    @Enumerated(EnumType.STRING)
+    private LessonStatus status;
+
+    @Enumerated(EnumType.STRING)
+    private SourceType sourceType;
+
     private String sourceUrl;
     private Integer estimatedDuration;
 
@@ -31,6 +49,10 @@ public class LessonEntity {
     @JsonIgnore
     private List<LessonFormatEntity> formats;
 
+    @JsonProperty(value = "courseId", access = JsonProperty.Access.READ_ONLY)
+    public String getCourseId() {
+        return course == null ? null : course.getId();
+    }
 
     public String getId() { 
         return id; 
@@ -56,19 +78,19 @@ public class LessonEntity {
         this.title = title; 
     }
 
-    public String getStatus() { 
+    public LessonStatus getStatus() { 
         return status; 
     }
     
-    public void setStatus(String status) { 
+    public void setStatus(LessonStatus status) { 
         this.status = status; 
     }
 
-    public String getSourceType() { 
+    public SourceType getSourceType() { 
         return sourceType; 
     }
     
-    public void setSourceType(String sourceType) { 
+    public void setSourceType(SourceType sourceType) { 
         this.sourceType = sourceType; 
     }
 

@@ -9,5 +9,5 @@ import com.csit321G6.tripleD.step.entity.LessonEntity;
 
 @Repository
 public interface LessonRepository extends JpaRepository<LessonEntity, String> {
-    List<LessonEntity> findByCourseId(String courseId);
+    List<LessonEntity> findByCourse_Id(String courseId);
 }

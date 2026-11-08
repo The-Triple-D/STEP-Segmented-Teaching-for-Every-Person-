@@ -1,8 +1,19 @@
 package com.csit321G6.tripleD.step.controller;
 
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.csit321G6.tripleD.step.entity.CourseEntity;
 import com.csit321G6.tripleD.step.service.CourseService;
 
@@ -22,6 +33,11 @@ public class CourseController {
     @PostMapping("/postNewCourse")
     public CourseEntity postCourse(@RequestBody CourseEntity course) {
         return cserv.createCourse(course);
+    }
+
+    @GetMapping("/getCourse/{id}")
+    public CourseEntity getCourse(@PathVariable String id) {
+        return cserv.getCourseById(id);
     }
 
     @GetMapping("/getAllCourses")

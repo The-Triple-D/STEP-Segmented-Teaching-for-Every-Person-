@@ -1,9 +1,12 @@
 package com.csit321G6.tripleD.step.service;
 
 import java.util.List;
-import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
 import com.csit321G6.tripleD.step.entity.LessonEntity;
 import com.csit321G6.tripleD.step.entity.LessonFormatEntity;
 import com.csit321G6.tripleD.step.repository.LessonFormatRepository;
@@ -19,41 +22,49 @@ public class LessonFormatService {
     private LessonRepository lessonRepository;
 
     public LessonFormatEntity createFormat(String lessonId, LessonFormatEntity format) {
-        Optional<LessonEntity> optionalLesson = lessonRepository.findById(lessonId);
-        
-        if (optionalLesson.isPresent()) {
-            format.setId(null);
-            format.setLesson(optionalLesson.get());
-            return formatRepository.save(format);
-        } else {
-            return null;
-        }
+        LessonEntity lesson = lessonRepository.findById(lessonId).orElseThrow(() ->
+            new ResponseStatusException(HttpStatus.NOT_FOUND, "Lesson " + lessonId + " does not exist"));
+        validate(format);
+        format.setId(null);
+        format.setLesson(lesson);
+        return formatRepository.save(format);
+    }
+
+    public List<LessonFormatEntity> getAllFormats() {
+        return formatRepository.findAll();
+    }
+
+    public LessonFormatEntity getFormatById(String id) {
+        return formatRepository.findById(id).orElseThrow(() ->
+            new ResponseStatusException(HttpStatus.NOT_FOUND, "Lesson format " + id + " does not exist"));
     }
 
     public List<LessonFormatEntity> getFormatsByLesson(String lessonId) {
-        return formatRepository.findByLessonId(lessonId);
+        if (!lessonRepository.existsById(lessonId)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lesson " + lessonId + " does not exist");
+        }
+        return formatRepository.findByLesson_Id(lessonId);
     }
 
     public LessonFormatEntity updateFormat(String id, LessonFormatEntity details) {
-        Optional<LessonFormatEntity> optionalFormat = formatRepository.findById(id);
-        
-        if (optionalFormat.isPresent()) {
-            LessonFormatEntity format = optionalFormat.get();
-            format.setFormatKind(details.getFormatKind());
-            format.setContent(details.getContent());
-            format.setFileUrl(details.getFileUrl());
-            return formatRepository.save(format);
-        } else {
-            return null;
-        }
+        LessonFormatEntity format = getFormatById(id);
+        validate(details);
+        format.setFormatKind(details.getFormatKind());
+        format.setContent(details.getContent());
+        format.setFileUrl(details.getFileUrl());
+        return formatRepository.save(format);
     }
 
     public String deleteFormat(String id) {
-        if (formatRepository.existsById(id)) {
-            formatRepository.deleteById(id);
-            return "Lesson Format " + id + " is successfully deleted!";
-        } else {
-            return "Error: Lesson Format " + id + " does not exist!";
+        getFormatById(id);
+        formatRepository.deleteById(id);
+        return "Lesson Format " + id + " is successfully deleted!";
+    }
+
+    private void validate(LessonFormatEntity format) {
+        if (format.getFormatKind() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                "Format kind is required (TRANSCRIPT, TEXT or VISUAL_SUMMARY)");
         }
     }
 }

@@ -1,9 +1,12 @@
 package com.csit321G6.tripleD.step.service;
 
 import java.util.List;
-import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
 import com.csit321G6.tripleD.step.entity.CourseEntity;
 import com.csit321G6.tripleD.step.repository.CourseRepository;
 
@@ -14,6 +17,7 @@ public class CourseService {
     private CourseRepository courseRepository;
 
     public CourseEntity createCourse(CourseEntity course) {
+        validate(course);
         course.setId(null);
         return courseRepository.save(course);
     }
@@ -22,26 +26,31 @@ public class CourseService {
         return courseRepository.findAll();
     }
 
+    public CourseEntity getCourseById(String id) {
+        return courseRepository.findById(id).orElseThrow(() ->
+            new ResponseStatusException(HttpStatus.NOT_FOUND, "Course " + id + " does not exist"));
+    }
+
     public CourseEntity updateCourse(String id, CourseEntity details) {
-        Optional<CourseEntity> optionalCourse = courseRepository.findById(id);
-        
-        if (optionalCourse.isPresent()) {
-            CourseEntity course = optionalCourse.get();
-            course.setTitle(details.getTitle());
-            course.setDescription(details.getDescription());
+        CourseEntity course = getCourseById(id);
+        validate(details);
+        course.setTitle(details.getTitle());
+        course.setDescription(details.getDescription());
+        if (details.getInstructorId() != null) {
             course.setInstructorId(details.getInstructorId());
-            return courseRepository.save(course);
-        } else {
-            return null;
         }
+        return courseRepository.save(course);
     }
 
     public String deleteCourse(String id) {
-        if (courseRepository.existsById(id)) {
-            courseRepository.deleteById(id);
-            return "Course " + id + " is successfully deleted!";
-        } else {
-            return "Error: Course " + id + " does not exist!";
+        getCourseById(id);
+        courseRepository.deleteById(id);
+        return "Course " + id + " is successfully deleted!";
+    }
+
+    private void validate(CourseEntity course) {
+        if (course.getTitle() == null || course.getTitle().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Title is required");
         }
     }
 }

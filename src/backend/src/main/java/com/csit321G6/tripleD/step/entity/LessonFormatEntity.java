@@ -1,12 +1,23 @@
 package com.csit321G6.tripleD.step.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "lesson_formats")
 public class LessonFormatEntity {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
@@ -16,12 +27,18 @@ public class LessonFormatEntity {
     @JsonIgnore
     private LessonEntity lesson;
 
-    private String formatKind;
+    @Enumerated(EnumType.STRING)
+    private FormatKind formatKind;
 
     @Column(columnDefinition = "TEXT")
     private String content;
+
     private String fileUrl;
 
+    @JsonProperty(value = "lessonId", access = JsonProperty.Access.READ_ONLY)
+    public String getLessonId() {
+        return lesson == null ? null : lesson.getId();
+    }
 
     public String getId() { 
         return id; 
@@ -39,11 +56,11 @@ public class LessonFormatEntity {
         this.lesson = lesson; 
     }
 
-    public String getFormatKind() { 
+    public FormatKind getFormatKind() { 
         return formatKind; 
     }
     
-    public void setFormatKind(String formatKind) { 
+    public void setFormatKind(FormatKind formatKind) { 
         this.formatKind = formatKind; 
     }
 

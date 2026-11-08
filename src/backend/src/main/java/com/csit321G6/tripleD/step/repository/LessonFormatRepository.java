@@ -9,5 +9,5 @@ import com.csit321G6.tripleD.step.entity.LessonFormatEntity;
 
 @Repository
 public interface LessonFormatRepository extends JpaRepository<LessonFormatEntity, String> {
-    List<LessonFormatEntity> findByLessonId(String lessonId);
+    List<LessonFormatEntity> findByLesson_Id(String lessonId);
 }
