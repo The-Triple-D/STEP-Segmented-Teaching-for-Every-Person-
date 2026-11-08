@@ -1,13 +1,7 @@
 package com.csit321G6.tripleD.step.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "segments")
@@ -19,28 +13,31 @@ public class SegmentEntity {
 
     @ManyToOne
     @JoinColumn(name = "lesson_id", nullable = false)
+    @JsonIgnore
     private LessonEntity lesson;
+
     private Integer orderIndex;
+    
     @Column(columnDefinition = "TEXT")
     private String text;
+    
     private Double startTime;
     private Double endTime;
     private Integer wordCount; 
     private Integer estimatedMinutes;
 
-
     public String getId() { 
         return id; 
     }
-
+    
     public void setId(String id) { 
-        this.id = id;
+        this.id = id; 
     }
 
     public LessonEntity getLesson() { 
         return lesson; 
     }
-
+    
     public void setLesson(LessonEntity lesson) { 
         this.lesson = lesson; 
     }
@@ -48,7 +45,7 @@ public class SegmentEntity {
     public Integer getOrderIndex() { 
         return orderIndex; 
     }
-
+    
     public void setOrderIndex(Integer orderIndex) { 
         this.orderIndex = orderIndex; 
     }
@@ -56,7 +53,7 @@ public class SegmentEntity {
     public String getText() { 
         return text; 
     }
-
+    
     public void setText(String text) { 
         this.text = text; 
     }
@@ -64,7 +61,7 @@ public class SegmentEntity {
     public Double getStartTime() { 
         return startTime; 
     }
-
+    
     public void setStartTime(Double startTime) { 
         this.startTime = startTime; 
     }
@@ -72,7 +69,7 @@ public class SegmentEntity {
     public Double getEndTime() { 
         return endTime; 
     }
-
+    
     public void setEndTime(Double endTime) { 
         this.endTime = endTime; 
     }
@@ -80,7 +77,7 @@ public class SegmentEntity {
     public Integer getWordCount() { 
         return wordCount; 
     }
-
+    
     public void setWordCount(Integer wordCount) { 
         this.wordCount = wordCount; 
     }
@@ -88,7 +85,7 @@ public class SegmentEntity {
     public Integer getEstimatedMinutes() { 
         return estimatedMinutes; 
     }
-
+    
     public void setEstimatedMinutes(Integer estimatedMinutes) { 
         this.estimatedMinutes = estimatedMinutes; 
     }

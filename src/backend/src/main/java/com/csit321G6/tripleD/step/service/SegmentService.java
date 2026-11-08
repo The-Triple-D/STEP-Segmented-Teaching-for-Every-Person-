@@ -1,10 +1,10 @@
 package com.csit321G6.tripleD.step.service;
 
 import java.util.List;
-
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import com.csit321G6.tripleD.step.entity.LessonEntity;
 import com.csit321G6.tripleD.step.entity.SegmentEntity;
 import com.csit321G6.tripleD.step.repository.LessonRepository;
 import com.csit321G6.tripleD.step.repository.SegmentRepository;
@@ -19,10 +19,15 @@ public class SegmentService {
     private LessonRepository lessonRepository;
 
     public SegmentEntity createSegment(String lessonId, SegmentEntity segment) {
-        return lessonRepository.findById(lessonId).map(lesson -> {
-            segment.setLesson(lesson);
+        Optional<LessonEntity> optionalLesson = lessonRepository.findById(lessonId);
+        
+        if (optionalLesson.isPresent()) {
+            segment.setId(null);
+            segment.setLesson(optionalLesson.get());
             return segmentRepository.save(segment);
-        }).orElseThrow(() -> new RuntimeException("Lesson not found"));
+        } else {
+            return null;
+        }
     }
 
     public List<SegmentEntity> getSegmentsByLesson(String lessonId) {
@@ -30,7 +35,10 @@ public class SegmentService {
     }
 
     public SegmentEntity updateSegment(String id, SegmentEntity details) {
-        return segmentRepository.findById(id).map(segment -> {
+        Optional<SegmentEntity> optionalSegment = segmentRepository.findById(id);
+        
+        if (optionalSegment.isPresent()) {
+            SegmentEntity segment = optionalSegment.get();
             segment.setOrderIndex(details.getOrderIndex());
             segment.setText(details.getText());
             segment.setStartTime(details.getStartTime());
@@ -38,10 +46,17 @@ public class SegmentService {
             segment.setWordCount(details.getWordCount());
             segment.setEstimatedMinutes(details.getEstimatedMinutes());
             return segmentRepository.save(segment);
-        }).orElse(null);
+        } else {
+            return null;
+        }
     }
 
-    public void deleteSegment(String id) {
-        segmentRepository.deleteById(id);
+    public String deleteSegment(String id) {
+        if (segmentRepository.existsById(id)) {
+            segmentRepository.deleteById(id);
+            return "Segment " + id + " is successfully deleted!";
+        } else {
+            return "Error: Segment " + id + " does not exist!";
+        }
     }
 }

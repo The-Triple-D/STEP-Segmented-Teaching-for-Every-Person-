@@ -1,10 +1,10 @@
 package com.csit321G6.tripleD.step.service;
 
 import java.util.List;
-
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import com.csit321G6.tripleD.step.entity.CourseEntity;
 import com.csit321G6.tripleD.step.entity.LessonEntity;
 import com.csit321G6.tripleD.step.repository.CourseRepository;
 import com.csit321G6.tripleD.step.repository.LessonRepository;
@@ -19,10 +19,20 @@ public class LessonService {
     private CourseRepository courseRepository;
 
     public LessonEntity createLesson(String courseId, LessonEntity lesson) {
-        return courseRepository.findById(courseId).map(course -> {
-            lesson.setCourse(course);
+        Optional<CourseEntity> optionalCourse = courseRepository.findById(courseId);
+        
+        if (optionalCourse.isPresent()) {
+            lesson.setId(null);
+            
+            if (lesson.getStatus() == null || lesson.getStatus().isEmpty()) {
+                lesson.setStatus("DRAFT");
+            }
+            
+            lesson.setCourse(optionalCourse.get());
             return lessonRepository.save(lesson);
-        }).orElseThrow(() -> new RuntimeException("Course not found"));
+        } else {
+            return null;
+        }
     }
 
     public List<LessonEntity> getLessonsByCourse(String courseId) {
@@ -30,17 +40,27 @@ public class LessonService {
     }
 
     public LessonEntity updateLesson(String id, LessonEntity details) {
-        return lessonRepository.findById(id).map(existingLesson -> {
-            existingLesson.setTitle(details.getTitle());
-            existingLesson.setStatus(details.getStatus());
-            existingLesson.setSourceType(details.getSourceType());
-            existingLesson.setSourceUrl(details.getSourceUrl());
-            existingLesson.setEstimatedDuration(details.getEstimatedDuration());
-            return lessonRepository.save(existingLesson);
-        }).orElse(null);
+        Optional<LessonEntity> optionalLesson = lessonRepository.findById(id);
+        
+        if (optionalLesson.isPresent()) {
+            LessonEntity lesson = optionalLesson.get();
+            lesson.setTitle(details.getTitle());
+            lesson.setStatus(details.getStatus());
+            lesson.setSourceType(details.getSourceType());
+            lesson.setSourceUrl(details.getSourceUrl());
+            lesson.setEstimatedDuration(details.getEstimatedDuration());
+            return lessonRepository.save(lesson);
+        } else {
+            return null;
+        }
     }
 
-    public void deleteLesson(String id) {
-        lessonRepository.deleteById(id);
+    public String deleteLesson(String id) {
+        if (lessonRepository.existsById(id)) {
+            lessonRepository.deleteById(id);
+            return "Lesson " + id + " is successfully deleted!";
+        } else {
+            return "Error: Lesson " + id + " does not exist!";
+        }
     }
 }

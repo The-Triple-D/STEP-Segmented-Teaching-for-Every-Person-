@@ -1,10 +1,9 @@
 package com.csit321G6.tripleD.step.service;
 
 import java.util.List;
-
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import com.csit321G6.tripleD.step.entity.CourseEntity;
 import com.csit321G6.tripleD.step.repository.CourseRepository;
 
@@ -15,6 +14,7 @@ public class CourseService {
     private CourseRepository courseRepository;
 
     public CourseEntity createCourse(CourseEntity course) {
+        course.setId(null);
         return courseRepository.save(course);
     }
 
@@ -23,15 +23,25 @@ public class CourseService {
     }
 
     public CourseEntity updateCourse(String id, CourseEntity details) {
-        return courseRepository.findById(id).map(course -> {
+        Optional<CourseEntity> optionalCourse = courseRepository.findById(id);
+        
+        if (optionalCourse.isPresent()) {
+            CourseEntity course = optionalCourse.get();
             course.setTitle(details.getTitle());
             course.setDescription(details.getDescription());
             course.setInstructorId(details.getInstructorId());
             return courseRepository.save(course);
-        }).orElse(null);
+        } else {
+            return null;
+        }
     }
 
-    public void deleteCourse(String id) {
-        courseRepository.deleteById(id);
+    public String deleteCourse(String id) {
+        if (courseRepository.existsById(id)) {
+            courseRepository.deleteById(id);
+            return "Course " + id + " is successfully deleted!";
+        } else {
+            return "Error: Course " + id + " does not exist!";
+        }
     }
 }
