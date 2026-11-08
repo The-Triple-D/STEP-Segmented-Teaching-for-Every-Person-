@@ -3,6 +3,7 @@ package com.csit321G6.tripleD.step.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,7 +19,7 @@ import com.csit321G6.tripleD.step.service.LessonService;
 
 @RestController
 @RequestMapping("/lesson/api")
-// @CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "*")
 public class LessonController {
 
     @Autowired
@@ -27,6 +28,16 @@ public class LessonController {
     @PostMapping("/postNewLesson/{courseId}")
     public LessonEntity postLesson(@PathVariable String courseId, @RequestBody LessonEntity lesson) {
         return lserv.createLesson(courseId, lesson);
+    }
+
+    @GetMapping("/getAllLessons")
+    public List<LessonEntity> getAllLessons() {
+        return lserv.getAllLessons();
+    }
+
+    @GetMapping("/getLesson/{id}")
+    public LessonEntity getLesson(@PathVariable String id) {
+        return lserv.getLessonById(id);
     }
 
     @GetMapping("/getLessonsByCourse/{courseId}")
@@ -41,7 +52,6 @@ public class LessonController {
 
     @DeleteMapping("/deleteLesson/{id}")
     public String deleteLesson(@PathVariable String id) {
-        lserv.deleteLesson(id);
-        return "Lesson " + id + " is successfully deleted!";
+        return lserv.deleteLesson(id);
     }
 }
