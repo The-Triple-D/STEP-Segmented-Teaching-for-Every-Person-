@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import AuthLayout from '../components/AuthLayout.jsx'
 import { useAuth } from '../context/useAuth.js'
 
 export default function EditAccount() {
@@ -31,19 +32,19 @@ export default function EditAccount() {
   }
 
   return (
-    <div>
+    <AuthLayout intro={false}>
       <h1>Edit account</h1>
       {error && <p role="alert">{error}</p>}
       {message && <p role="status">{message}</p>}
       <form onSubmit={submit}>
-        <p><label>First name<br /><input name="firstName" value={form.firstName} onChange={update} required /></label></p>
-        <p><label>Last name<br /><input name="lastName" value={form.lastName} onChange={update} required /></label></p>
-        <p><label>Email<br /><input name="email" type="email" value={form.email} onChange={update} required /></label></p>
+        <p><label>First name<input name="firstName" value={form.firstName} onChange={update} required /></label></p>
+        <p><label>Last name<input name="lastName" value={form.lastName} onChange={update} required /></label></p>
+        <p><label>University email<input name="email" type="email" value={form.email} onChange={update} required /></label></p>
         <h2>Change password (optional)</h2>
-        <p><label>Current password<br /><input name="currentPassword" type="password" value={form.currentPassword} onChange={update} autoComplete="current-password" /></label></p>
-        <p><label>New password<br /><input name="newPassword" type="password" value={form.newPassword} onChange={update} autoComplete="new-password" /></label></p>
+        <p><label>Current password<input name="currentPassword" type="password" value={form.currentPassword} onChange={update} autoComplete="current-password" /></label></p>
+        <p><label>New password<input name="newPassword" type="password" value={form.newPassword} onChange={update} autoComplete="new-password" /></label></p>
         <button type="submit">Save changes</button>
       </form>
-    </div>
+    </AuthLayout>
   )
 }

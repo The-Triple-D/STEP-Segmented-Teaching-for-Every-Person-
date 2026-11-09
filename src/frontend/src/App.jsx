@@ -16,14 +16,12 @@ import ForgotPassword from './pages/ForgotPassword.jsx'
 import ResetPassword from './pages/ResetPassword.jsx'
 import EditAccount from './pages/EditAccount.jsx'
 import NotFound from './pages/NotFound.jsx'
-import RoleChoice from './pages/RoleChoice.jsx'
 
 export default function App() {
   return (
     <Routes>
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
-        <Route path="/role/:role" element={<RoleChoice />} />
         <Route path="/courses" element={<CourseList />} />
         <Route path="/courses/:id" element={<LessonList />} />
         <Route path="/lessons/:id" element={<LessonPage />} />

@@ -18,6 +18,22 @@ function write(key, value) {
   localStorage.setItem(key, JSON.stringify(value))
 }
 
+function readSession() {
+  try {
+    const raw = sessionStorage.getItem(SESSION_KEY) ?? localStorage.getItem(SESSION_KEY)
+    return raw ? JSON.parse(raw) : null
+  } catch {
+    return null
+  }
+}
+
+function writeSession(id, remember) {
+  localStorage.removeItem(SESSION_KEY)
+  sessionStorage.removeItem(SESSION_KEY)
+  const store = remember ? localStorage : sessionStorage
+  store.setItem(SESSION_KEY, JSON.stringify(id))
+}
+
 function publicUser(u) {
   if (!u) return null
   return { id: u.id, firstName: u.firstName, lastName: u.lastName, email: u.email, role: u.role }
@@ -25,7 +41,7 @@ function publicUser(u) {
 
 export default function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
-    const id = read(SESSION_KEY, null)
+    const id = readSession()
     return publicUser(read(USERS_KEY, []).find((u) => u.id === id))
   })
 
@@ -44,12 +60,12 @@ export default function AuthProvider({ children }) {
       role,
     }
     write(USERS_KEY, [...users, created])
-    write(SESSION_KEY, created.id)
+    writeSession(created.id, true)
     setUser(publicUser(created))
     return { ok: true }
   }
 
-    function login(email, password, role) {
+  function login(email, password, role, remember = false) {
     const found = read(USERS_KEY, []).find((u) => u.email === email.trim().toLowerCase())
     if (!found || found.password !== password) {
       return { ok: false, error: 'Incorrect email or password.' }
@@ -59,13 +75,14 @@ export default function AuthProvider({ children }) {
       const label = found.role === 'student' ? 'Student' : 'Instructor'
       return { ok: false, error: `This account is registered as ${actual}. Go back and choose ${label}.` }
     }
-    write(SESSION_KEY, found.id)
+    writeSession(found.id, remember)
     setUser(publicUser(found))
     return { ok: true }
   }
 
   function logout() {
     localStorage.removeItem(SESSION_KEY)
+    sessionStorage.removeItem(SESSION_KEY)
     setUser(null)
   }
 

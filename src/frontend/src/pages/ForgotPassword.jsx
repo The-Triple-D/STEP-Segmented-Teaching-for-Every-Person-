@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import AuthLayout from '../components/AuthLayout.jsx'
 import { useAuth } from '../context/useAuth.js'
 
 export default function ForgotPassword() {
@@ -16,21 +17,26 @@ export default function ForgotPassword() {
   }
 
   return (
-    <div>
+    <AuthLayout>
       <h1>Forgot password</h1>
       <form onSubmit={submit}>
-        <p><label>Email<br /><input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="email" /></label></p>
+        <p>
+          <label>
+            University email
+            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="example@email.com" required autoComplete="email" />
+          </label>
+        </p>
         <button type="submit">Send reset link</button>
       </form>
       {sent && (
-        <div role="status">
+        <div role="status" className="auth-notice">
           <p>If an account exists for that email, a reset link has been sent.</p>
           {token && (
             <p>Mock mode only: <Link to={`/reset-password/${token}`}>open the reset page</Link></p>
           )}
         </div>
       )}
-        <p><Link to="/">Back to home</Link></p>
-    </div>
+      <p className="center auth-after"><Link to="/">Back to home</Link></p>
+    </AuthLayout>
   )
 }

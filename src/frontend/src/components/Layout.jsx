@@ -1,7 +1,8 @@
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
+import AccessibilityBar from './AccessibilityBar.jsx'
 import { useAuth } from '../context/useAuth.js'
 
-const AUTH_PREFIXES = ['/role', '/login', '/register', '/forgot-password', '/reset-password', '/account']
+const AUTH_PREFIXES = ['/login', '/register', '/forgot-password', '/reset-password', '/account']
 
 export default function Layout() {
   const { user, logout } = useAuth()
@@ -29,6 +30,7 @@ export default function Layout() {
             </>
           )}
         </nav>
+        <AccessibilityBar />
       </header>
       <main className={authPage ? 'auth-main' : undefined}>
         <Outlet />
