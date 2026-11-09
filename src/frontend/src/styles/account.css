@@ -1,0 +1,115 @@
+header {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #999999;
+  font-family: system-ui, sans-serif;
+}
+
+header nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+header nav button {
+  font: inherit;
+  padding: 0.25rem 0.75rem;
+  border: 1px solid #000000;
+  background: #eeeeee;
+  color: #000000;
+  cursor: pointer;
+}
+
+.auth-main {
+  box-sizing: border-box;
+  max-width: 28rem;
+  margin: 0 auto;
+  padding: 1.5rem 1rem;
+  font-family: system-ui, sans-serif;
+  color: #000000;
+  background: #ffffff;
+}
+
+.auth-main h1 {
+  margin: 0 0 1rem;
+  font-size: 1.75rem;
+}
+
+.auth-main h2 {
+  margin: 1.5rem 0 0.5rem;
+  font-size: 1.25rem;
+}
+
+.auth-main p {
+  margin: 0 0 1rem;
+  line-height: 1.5;
+}
+
+.auth-main label {
+  display: block;
+  font-weight: 700;
+}
+
+.auth-main label br {
+  display: none;
+}
+
+.auth-main input,
+.auth-main select {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  margin-top: 0.25rem;
+  padding: 0.5rem;
+  font: inherit;
+  font-weight: 400;
+  color: #000000;
+  background: #ffffff;
+  border: 1px solid #000000;
+}
+
+.auth-main button[type="submit"],
+.auth-main .big-link {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 0.6rem 1rem;
+  font: inherit;
+  text-align: center;
+  text-decoration: none;
+  color: #000000;
+  background: #eeeeee;
+  border: 1px solid #000000;
+  cursor: pointer;
+}
+
+.auth-main button[type="submit"]:hover,
+.auth-main .big-link:hover {
+  background: #dddddd;
+}
+
+.auth-main [role="alert"],
+.auth-main [role="status"] {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #000000;
+}
+
+.auth-main [role="alert"]::before {
+  content: "Error: ";
+  font-weight: 700;
+}
+
+.auth-main [role="status"]::before {
+  content: "Notice: ";
+  font-weight: 700;
+}
+
+header a:focus-visible,
+header button:focus-visible,
+.auth-main a:focus-visible,
+.auth-main button:focus-visible,
+.auth-main input:focus-visible,
+.auth-main select:focus-visible {
+  outline: 3px solid #0000ff;
+  outline-offset: 2px;
+}
