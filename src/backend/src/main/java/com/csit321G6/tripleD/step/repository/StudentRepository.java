@@ -1,12 +1,14 @@
 package com.csit321G6.tripleD.step.repository;
 
-import com.csit321G6.tripleD.step.entity.StudentEntity;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
+import com.csit321G6.tripleD.step.entity.StudentEntity;
 
 @Repository
-public interface StudentRepository extends JpaRepository<StudentEntity, Long> {
-    Optional<StudentEntity> findByUserId(Long userId);
+public interface StudentRepository extends JpaRepository<StudentEntity, String> {
+    Optional<StudentEntity> findByUser_Id(String userId);
+    boolean existsByUser_Id(String userId);
 }

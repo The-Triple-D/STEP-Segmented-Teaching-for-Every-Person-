@@ -1,25 +1,21 @@
 package com.csit321G6.tripleD.step.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
 import java.time.LocalDate;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "students")
 public class StudentEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id; // the school ID, supplied by the client
 
     @OneToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false, unique = true)
+    @JsonIgnore
     private UserEntity user;
 
     @Column(name = "current_streak", nullable = false)
@@ -30,31 +26,15 @@ public class StudentEntity {
 
     public StudentEntity() {}
 
-    public Long getId() { 
-        return id; 
-    }
-    public void setId(Long id) { 
-        this.id = id; 
-    }
+    @JsonProperty(value = "userId", access = JsonProperty.Access.READ_ONLY)
+    public String getUserId() { return user == null ? null : user.getId(); }
 
-    public UserEntity getUser() { 
-        return user; 
-    }
-    public void setUser(UserEntity user) { 
-        this.user = user; 
-    }
-
-    public int getCurrentStreak() { 
-        return currentStreak; 
-    }
-    public void setCurrentStreak(int currentStreak) { 
-        this.currentStreak = currentStreak; 
-    }
-
-    public LocalDate getLastStudyDate() { 
-        return lastStudyDate; 
-    }
-    public void setLastStudyDate(LocalDate lastStudyDate) { 
-        this.lastStudyDate = lastStudyDate; 
-    }
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
+    public UserEntity getUser() { return user; }
+    public void setUser(UserEntity user) { this.user = user; }
+    public int getCurrentStreak() { return currentStreak; }
+    public void setCurrentStreak(int currentStreak) { this.currentStreak = currentStreak; }
+    public LocalDate getLastStudyDate() { return lastStudyDate; }
+    public void setLastStudyDate(LocalDate lastStudyDate) { this.lastStudyDate = lastStudyDate; }
 }

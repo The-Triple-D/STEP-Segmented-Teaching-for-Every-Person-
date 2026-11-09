@@ -1,34 +1,43 @@
 package com.csit321G6.tripleD.step.controller;
 
-import com.csit321G6.tripleD.step.entity.StudentEntity;
-import com.csit321G6.tripleD.step.service.StudentService;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import com.csit321G6.tripleD.step.entity.StudentEntity;
+import com.csit321G6.tripleD.step.service.StudentService;
 
 @RestController
 @RequestMapping("/student/api")
+@CrossOrigin(origins = "*")
 public class StudentController {
 
     @Autowired
     private StudentService studentService;
+
+    @PostMapping("/createStudent/{userId}")
+    public StudentEntity createStudent(@PathVariable String userId, @RequestBody StudentEntity student) {
+        return studentService.createStudent(userId, student);
+    }
 
     @GetMapping("/getAllStudents")
     public List<StudentEntity> getAllStudents() {
         return studentService.getAllStudents();
     }
 
-    @PostMapping("/createStudent")
-    public ResponseEntity<StudentEntity> createStudent(@RequestBody StudentEntity student) {
-        StudentEntity savedStudent = studentService.saveStudent(student);
-        return ResponseEntity.ok(savedStudent);
+    @GetMapping("/getStudentById/{id}")
+    public StudentEntity getStudentById(@PathVariable String id) {
+        return studentService.getStudentById(id);
+    }
+
+    @PutMapping("/putStudent")
+    public StudentEntity putStudent(@RequestParam String id, @RequestBody StudentEntity details) {
+        return studentService.updateStudent(id, details);
     }
 
     @DeleteMapping("/deleteStudent/{id}")
-    public ResponseEntity<String> deleteStudent(@PathVariable Long id) {
-        studentService.deleteStudent(id);
-        return ResponseEntity.ok("Student deleted successfully");
+    public String deleteStudent(@PathVariable String id) {
+        return studentService.deleteStudent(id);
     }
 }
