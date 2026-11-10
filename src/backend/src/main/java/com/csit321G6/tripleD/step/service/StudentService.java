@@ -15,7 +15,6 @@ import com.csit321G6.tripleD.step.repository.UserRepository;
 @Service
 public class StudentService {
 
-    // CHANGE THIS to match the real school ID format (example: 23-1234-567)
     private static final String SCHOOL_ID_FORMAT = "^\\d{2}-\\d{4}-\\d{3}$";
 
     @Autowired
