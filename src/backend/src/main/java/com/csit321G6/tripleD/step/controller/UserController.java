@@ -1,23 +1,16 @@
 package com.csit321G6.tripleD.step.controller;
 
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
 import com.csit321G6.tripleD.step.entity.UserEntity;
 import com.csit321G6.tripleD.step.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/user/api")
-@CrossOrigin
+@CrossOrigin(origins = "*")
 public class UserController {
 
     @Autowired
@@ -25,7 +18,7 @@ public class UserController {
 
     @PostMapping("/createUser")
     public UserEntity createUser(@RequestBody UserEntity user) {
-        return userService.saveUser(user);
+        return userService.createUser(user);
     }
 
     @GetMapping("/getAllUsers")
@@ -34,13 +27,17 @@ public class UserController {
     }
 
     @GetMapping("/getUserById/{id}")
-    public UserEntity getUserById(@PathVariable Long id) {
+    public UserEntity getUserById(@PathVariable String id) {
         return userService.getUserById(id);
     }
 
+    @PutMapping("/putUser")
+    public UserEntity putUser(@RequestParam String id, @RequestBody UserEntity details) {
+        return userService.updateUser(id, details);
+    }
+
     @DeleteMapping("/deleteUser/{id}")
-    public ResponseEntity<String> deleteUser(@PathVariable Long id) {
-        userService.deleteUser(id);
-        return ResponseEntity.ok("User deleted successfully");
+    public String deleteUser(@PathVariable String id) {
+        return userService.deleteUser(id);
     }
 }
