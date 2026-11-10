@@ -4,14 +4,20 @@ import java.time.LocalDate;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.persistence.*;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "students")
 public class StudentEntity {
 
     @Id
-    private String id; // the school ID, supplied by the client
+    private String id;
 
     @OneToOne
     @JoinColumn(name = "user_id", nullable = false, unique = true)
