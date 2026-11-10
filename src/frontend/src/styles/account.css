@@ -1,6 +1,34 @@
+:root,
+:root[data-theme="dark"] {
+  --page-bg: #121212;
+  --page-text: #e5e5e5;
+  --card-bg: #262626;
+  --card-text: #ffffff;
+  --track: #262626;
+  --track-border: #8a8a8a;
+  --fill-done: #10b981;
+  --fill-active: #3b82f6;
+  --focus: #facc15;
+  --auth-link: #60a5fa;
+  --auth-error-fg: #fca5a5;
+  --auth-error-bg: #450a0a;
+  --auth-error-border: #991b1b;
+  --auth-ok-fg: #6ee7b7;
+  --auth-ok-bg: #064e3b;
+  --auth-ok-border: #047857;
+}
 
-:root {
-  --auth-link: #1d4ed8;
+:root[data-theme="light"] {
+  --page-bg: #f1f5f9;
+  --page-text: #1e293b;
+  --card-bg: #ffffff;
+  --card-text: #1e293b;
+  --track: #ffffff;
+  --track-border: #64748b;
+  --fill-done: #047857;
+  --fill-active: #0284c7;
+  --focus: #0284c7;
+  --auth-link: #0369a1;
   --auth-error-fg: #7f1d1d;
   --auth-error-bg: #fef2f2;
   --auth-error-border: #b91c1c;
@@ -9,6 +37,24 @@
   --auth-ok-border: #047857;
 }
 
+:root[data-contrast="high"] {
+  --page-bg: #000000;
+  --page-text: #ffffff;
+  --card-bg: #ffffff;
+  --card-text: #000000;
+  --track: #ffffff;
+  --track-border: #000000;
+  --fill-done: #006400;
+  --fill-active: #8a3b00;
+  --focus: #ffe600;
+  --auth-link: #00008b;
+  --auth-error-fg: #5c0000;
+  --auth-error-bg: #ffffff;
+  --auth-error-border: #5c0000;
+  --auth-ok-fg: #003300;
+  --auth-ok-bg: #ffffff;
+  --auth-ok-border: #003300;
+}
 
 header {
   display: flex;
@@ -17,8 +63,8 @@ header {
   align-items: center;
   gap: 0.75rem 1.5rem;
   padding: 0.75rem 1rem;
-  background: #ffffff;
-  color: #0f172a;
+  background: var(--card-bg);
+  color: var(--card-text);
   border-bottom: 1px solid var(--track-border);
 }
 
@@ -30,7 +76,7 @@ header nav {
 }
 
 header a {
-  color: #0f172a;
+  color: var(--card-text);
   font-weight: 700;
 }
 
@@ -38,9 +84,9 @@ header nav button,
 .a11y-bar button {
   min-height: 2.25rem;
   padding: 0.25rem 0.9rem;
-  background: #ffffff;
-  color: #0f172a;
-  border: 2px solid #0f172a;
+  background: var(--card-bg);
+  color: var(--card-text);
+  border: 2px solid var(--card-text);
   border-radius: 999px;
   font: inherit;
   font-weight: 700;
@@ -71,7 +117,7 @@ header nav button,
   width: 1.15rem;
   height: 1.15rem;
   margin: 0;
-  accent-color: #0f172a;
+  accent-color: var(--card-text);
 }
 
 .a11y-bar__size {
@@ -83,10 +129,9 @@ header nav button,
 header a:focus-visible,
 header button:focus-visible,
 .a11y-bar input:focus-visible {
-  outline: 3px solid #0f172a;
+  outline: 3px solid var(--card-text);
   outline-offset: 2px;
 }
-
 
 .auth-main {
   box-sizing: border-box;
@@ -110,7 +155,6 @@ header button:focus-visible,
   grid-template-columns: minmax(0, 32rem);
   justify-content: center;
 }
-
 
 .auth-intro {
   color: var(--page-text);
@@ -146,7 +190,6 @@ header button:focus-visible,
   line-height: 1.7;
 }
 
-
 .auth-card {
   box-sizing: border-box;
   width: 100%;
@@ -154,6 +197,7 @@ header button:focus-visible,
   background: var(--card-bg);
   color: var(--card-text);
   border-radius: 1.75rem;
+  border: 1px solid var(--track-border);
 }
 
 .auth-card h1 {
@@ -191,7 +235,6 @@ header button:focus-visible,
   margin-top: 1.25rem;
 }
 
-
 .auth-card label {
   display: block;
   font-weight: 700;
@@ -211,7 +254,7 @@ header button:focus-visible,
   font: inherit;
   font-weight: 400;
   color: var(--card-text);
-  background: #ffffff;
+  background: var(--page-bg);
   border: 2px solid var(--track-border);
   border-radius: 0.75rem;
 }
@@ -239,7 +282,6 @@ header button:focus-visible,
   margin: 0;
   accent-color: var(--card-text);
 }
-
 
 .auth-card button[type="submit"],
 .auth-card .big-link {
@@ -269,7 +311,7 @@ header button:focus-visible,
 }
 
 .auth-card .big-link--alt:hover {
-  background: #e2e8f0;
+  background: var(--page-bg);
   opacity: 1;
 }
 
@@ -280,7 +322,6 @@ header button:focus-visible,
   }
 }
 
-
 .auth-card input:focus-visible,
 .auth-card select:focus-visible,
 .auth-card a:focus-visible,
@@ -289,7 +330,6 @@ header button:focus-visible,
   outline-offset: 3px;
   box-shadow: 0 0 0 7px var(--card-text);
 }
-
 
 .auth-card [role="alert"],
 .auth-card [role="status"] {
@@ -332,7 +372,6 @@ header button:focus-visible,
   margin-bottom: 0;
 }
 
-
 @media (max-width: 52rem) {
   .auth-split {
     grid-template-columns: minmax(0, 1fr);
@@ -344,24 +383,17 @@ header button:focus-visible,
   }
 }
 
-
-:root[data-contrast="high"] {
-  --page-bg: #000000;
-  --page-text: #ffffff;
-  --card-bg: #ffffff;
-  --card-text: #000000;
-  --track: #ffffff;
-  --track-border: #000000;
-  --fill-done: #006400;
-  --fill-active: #8a3b00;
-  --focus: #ffe600;
-  --auth-link: #00008b;
-  --auth-error-fg: #5c0000;
-  --auth-error-border: #5c0000;
-  --auth-ok-fg: #003300;
-  --auth-ok-border: #003300;
-}
-
 :root[data-contrast="high"] header {
   border-bottom: 3px solid #000000;
+}
+
+:root[data-contrast="high"] .auth-card input:not([type="checkbox"]),
+:root[data-contrast="high"] .auth-card select {
+  background: #ffffff;
+  color: #000000;
+}
+
+:root[data-contrast="high"] .auth-card .big-link--alt:hover {
+  background: #d9d9d9;
+  color: #000000;
 }

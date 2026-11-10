@@ -1,5 +1,6 @@
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import AccessibilityBar from './AccessibilityBar.jsx'
+import ThemeToggle from './ThemeToggle.jsx'
 import { useAuth } from '../context/useAuth.js'
 
 const AUTH_PREFIXES = ['/login', '/register', '/forgot-password', '/reset-password', '/account']
@@ -29,6 +30,7 @@ export default function Layout() {
               <button type="button" onClick={handleLogout}>Log out</button>
             </>
           )}
+          <ThemeToggle />
         </nav>
         <AccessibilityBar />
       </header>

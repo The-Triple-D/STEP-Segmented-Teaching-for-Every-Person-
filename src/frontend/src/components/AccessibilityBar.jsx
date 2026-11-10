@@ -31,6 +31,7 @@ export default function AccessibilityBar() {
     try {
       localStorage.setItem(KEY, JSON.stringify(display))
     } catch {
+      return
     }
   }, [display])
 

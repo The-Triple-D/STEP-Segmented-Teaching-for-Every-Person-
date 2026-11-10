@@ -1,14 +1,5 @@
 :root {
-  --page-bg: #006ef2;
-  --page-text: #ffffff;
-  --card-bg: #ffffff;
-  --card-text: #0f172a;
-  --track: #cbd5e1;
-  --track-border: #64748b;
-  --fill-done: #047857;
-  --fill-active: #b45309;
   --star: #ffc21f;
-  --focus: #ffd84d;
   --font-display: "Bebas Neue", Impact, "Arial Narrow", sans-serif;
   --font-body: "Atkinson Hyperlegible", system-ui, "Segoe UI", sans-serif;
   --heading-transform: uppercase;
@@ -22,8 +13,6 @@ html {
 body {
   margin: 0;
   font-family: var(--font-body);
-}
-
-header {
-  padding: 0.5rem 1rem;
+  background: var(--page-bg);
+  color: var(--page-text);
 }
