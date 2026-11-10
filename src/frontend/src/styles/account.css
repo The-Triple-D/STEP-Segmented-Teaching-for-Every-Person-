@@ -1,4 +1,3 @@
-/* Account pages: prototype layout (intro left, card right) with the course list look. */
 
 :root {
   --auth-link: #1d4ed8;
@@ -10,7 +9,6 @@
   --auth-ok-border: #047857;
 }
 
-/* ---------- Header ---------- */
 
 header {
   display: flex;
@@ -89,7 +87,6 @@ header button:focus-visible,
   outline-offset: 2px;
 }
 
-/* ---------- Page area ---------- */
 
 .auth-main {
   box-sizing: border-box;
@@ -114,7 +111,6 @@ header button:focus-visible,
   justify-content: center;
 }
 
-/* ---------- Intro column ---------- */
 
 .auth-intro {
   color: var(--page-text);
@@ -150,7 +146,6 @@ header button:focus-visible,
   line-height: 1.7;
 }
 
-/* ---------- Card ---------- */
 
 .auth-card {
   box-sizing: border-box;
@@ -196,7 +191,6 @@ header button:focus-visible,
   margin-top: 1.25rem;
 }
 
-/* ---------- Form fields ---------- */
 
 .auth-card label {
   display: block;
@@ -231,7 +225,6 @@ header button:focus-visible,
   margin: 0 0 1rem;
 }
 
-/* Two classes so it beats ".auth-card label" above. */
 .auth-card .auth-check {
   display: flex;
   align-items: center;
@@ -247,7 +240,6 @@ header button:focus-visible,
   accent-color: var(--card-text);
 }
 
-/* ---------- Buttons ---------- */
 
 .auth-card button[type="submit"],
 .auth-card .big-link {
@@ -288,7 +280,6 @@ header button:focus-visible,
   }
 }
 
-/* ---------- Focus ---------- */
 
 .auth-card input:focus-visible,
 .auth-card select:focus-visible,
@@ -299,7 +290,6 @@ header button:focus-visible,
   box-shadow: 0 0 0 7px var(--card-text);
 }
 
-/* ---------- Messages (text prefix, so color is never the only cue) ---------- */
 
 .auth-card [role="alert"],
 .auth-card [role="status"] {
@@ -342,7 +332,6 @@ header button:focus-visible,
   margin-bottom: 0;
 }
 
-/* ---------- Narrow screens: intro stacks above the card ---------- */
 
 @media (max-width: 52rem) {
   .auth-split {
@@ -355,7 +344,6 @@ header button:focus-visible,
   }
 }
 
-/* ---------- High contrast (set by the AccessibilityBar checkbox) ---------- */
 
 :root[data-contrast="high"] {
   --page-bg: #000000;
