@@ -1,21 +1,67 @@
-export default function AuthLayout({ children, intro = true }) {
+import StepLogo from './StepLogo.jsx'
+import ThemeToggle from './ThemeToggle.jsx'
+
+export default function AuthLayout({ children, intro = true, expanded = true }) {
   return (
-    <div className={intro ? 'auth-split' : 'auth-split auth-split--single'}>
-      {intro && (
-        <section className="auth-intro" aria-label="About STEP">
-          <p className="auth-intro__welcome">Welcome to</p>
-          <p className="auth-intro__brand">STEP</p>
-          <p className="auth-intro__tag">Segmented Teaching for Every Person</p>
-          <p className="auth-intro__text">
-            STEP is an accessible web-based learning platform that turns lengthy lectures
-            and dense PDFs into bite-sized micro-lessons with built-in check-in questions.
-            Students can switch between text, audio, and visual formats, follow calm,
-            low-pressure progress tracking, and use low-stimulation settings, all in an
-            interface built to align with WCAG 2.1 Level AA, without disclosing a diagnosis.
-          </p>
+    <div className="step-split-shell">
+
+      <div
+        aria-hidden="true"
+        style={{
+          position: 'fixed',
+          top: '-10%',
+          left: '-5%',
+          width: '420px',
+          height: '420px',
+          borderRadius: '50%',
+          background: 'var(--blob-color)',
+          filter: 'blur(90px)',
+          pointerEvents: 'none',
+        }}
+      />
+      <div
+        aria-hidden="true"
+        style={{
+          position: 'fixed',
+          bottom: '-12%',
+          right: '-5%',
+          width: '460px',
+          height: '460px',
+          borderRadius: '50%',
+          background: 'var(--blob-color)',
+          filter: 'blur(100px)',
+          pointerEvents: 'none',
+        }}
+      />
+
+      <main className={intro ? 'step-split-grid' : 'step-split-grid step-split-grid--single'}>
+        {intro && (
+          <section aria-labelledby="hero-heading" className="step-split-left">
+            <div className="step-split-logo">
+              <StepLogo style={{ width: '300px', maxWidth: '100%', height: 'auto', display: 'block' }} />
+            </div>
+
+            <h1 id="hero-heading" className="step-split-title">
+              <span style={{ color: 'var(--text-accent)' }}>Learn step by step,</span>{' '}
+              at a pace that works for you
+            </h1>
+
+            <p className="step-split-desc">
+              Break overwhelming lectures and readings into manageable, bite-sized
+              parts. Watch, read, or listen at your own rhythm, check your
+              understanding along the way, and pick up right where you left off.
+            </p>
+          </section>
+        )}
+
+        <section className="step-split-right">
+          <div className={`step-glass-card ${expanded ? 'step-glass-card--expanded' : 'step-glass-card--compact'}`}>
+            <div className="step-glass-card__inner">{children}</div>
+          </div>
         </section>
-      )}
-      <section className="auth-card">{children}</section>
+      </main>
+
+      <ThemeToggle />
     </div>
   )
 }
