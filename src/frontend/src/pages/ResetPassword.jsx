@@ -23,23 +23,75 @@ export default function ResetPassword() {
 
   if (done) {
     return (
-      <AuthLayout>
-        <h1>Password changed</h1>
-        <p role="status">Your password has been updated.</p>
-        <p><Link className="big-link" to="/">Go to home and log in</Link></p>
+      <AuthLayout expanded>
+        <div className="step-auth-header">
+          <h2 className="step-auth-heading">Password Changed</h2>
+        </div>
+
+        <p role="status" className="step-auth-status">
+          Your password has been updated.
+        </p>
+
+        <Link
+          to="/"
+          className="step-btn-primary"
+          style={{ display: 'block', textAlign: 'center', textDecoration: 'none' }}
+        >
+          BACK TO HOME
+        </Link>
       </AuthLayout>
     )
   }
 
   return (
-    <AuthLayout>
-      <h1>Reset password</h1>
-      {error && <p role="alert">{error}</p>}
-      <form onSubmit={submit}>
-        <p><label>New password (8+ characters)<input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required autoComplete="new-password" /></label></p>
-        <p><label>Confirm new password<input type="password" value={confirm} onChange={(e) => setConfirm(e.target.value)} required autoComplete="new-password" /></label></p>
-        <button type="submit">Change password</button>
+    <AuthLayout expanded>
+      <div className="step-auth-header">
+        <h2 className="step-auth-heading">Reset Password</h2>
+      </div>
+
+      {error && (
+        <p role="alert" className="step-auth-alert">
+          {error}
+        </p>
+      )}
+
+      <form onSubmit={submit} className="step-auth-form">
+        <label className="step-field">
+          <span>New password (8+ characters)</span>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="••••••••"
+            required
+            autoComplete="new-password"
+          />
+        </label>
+
+        <label className="step-field">
+          <span>Confirm new password</span>
+          <input
+            type="password"
+            value={confirm}
+            onChange={(e) => setConfirm(e.target.value)}
+            placeholder="••••••••"
+            required
+            autoComplete="new-password"
+          />
+        </label>
+
+        <button type="submit" className="step-btn-primary">
+          CHANGE PASSWORD
+        </button>
       </form>
+
+      <div className="step-auth-footer">
+        <p>
+          <Link to="/" className="step-auth-link step-auth-link--muted">
+            Back
+          </Link>
+        </p>
+      </div>
     </AuthLayout>
   )
 }
