@@ -1,6 +1,7 @@
 import { Routes, Route } from 'react-router-dom'
 import Layout from './components/Layout.jsx'
 import ProtectedRoute from './components/ProtectedRoute.jsx'
+import LandingPage from './pages/LandingPage.jsx'
 import Home from './pages/Home.jsx'
 import CourseList from './pages/CourseList.jsx'
 import LessonList from './pages/LessonList.jsx'
@@ -20,8 +21,12 @@ import NotFound from './pages/NotFound.jsx'
 export default function App() {
   return (
     <Routes>
+
+      <Route path="/" element={<LandingPage />} />
+
+
       <Route element={<Layout />}>
-        <Route path="/" element={<Home />} />
+        <Route path="/dashboard" element={<Home />} />
         <Route path="/courses" element={<CourseList />} />
         <Route path="/courses/:id" element={<LessonList />} />
         <Route path="/lessons/:id" element={<LessonPage />} />
