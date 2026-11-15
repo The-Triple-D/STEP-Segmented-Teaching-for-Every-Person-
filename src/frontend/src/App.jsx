@@ -21,9 +21,11 @@ import NotFound from './pages/NotFound.jsx'
 export default function App() {
   return (
     <Routes>
-
       <Route path="/" element={<LandingPage />} />
-
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password/:token" element={<ResetPassword />} />
 
       <Route element={<Layout />}>
         <Route path="/dashboard" element={<Home />} />
@@ -35,10 +37,6 @@ export default function App() {
         <Route path="/flashcards/:id" element={<Flashcards />} />
         <Route path="/progress" element={<Progress />} />
         <Route path="/settings" element={<Settings />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/reset-password/:token" element={<ResetPassword />} />
         <Route element={<ProtectedRoute />}>
           <Route path="/account" element={<EditAccount />} />
         </Route>

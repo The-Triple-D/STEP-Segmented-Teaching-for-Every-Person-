@@ -28,35 +28,74 @@ export default function Login() {
   const label = role === 'student' ? 'Student' : 'Instructor'
 
   return (
-    <AuthLayout>
-      <h1>{label} login</h1>
-      {error && <p role="alert">{error}</p>}
-      <form onSubmit={submit}>
-        <p>
-          <label>
-            University email
-            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="example@email.com" required autoComplete="email" />
-          </label>
+    <AuthLayout expanded>
+      <div className="step-auth-header">
+        <h2 className="step-auth-heading">{label} Log in</h2>
+      </div>
+
+      {error && (
+        <p role="alert" className="step-auth-alert">
+          {error}
         </p>
-        <p>
-          <label>
-            Password
-            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required autoComplete="current-password" />
+      )}
+
+      <form onSubmit={submit} className="step-auth-form">
+        <label className="step-field">
+          <span>School email</span>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="example@cit.edu"
+            required
+            autoComplete="email"
+          />
+        </label>
+
+        <label className="step-field">
+          <span>Password</span>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="••••••••"
+            required
+            autoComplete="current-password"
+          />
+        </label>
+
+        <div className="step-auth-row">
+          <label className="step-auth-check">
+            <input
+              type="checkbox"
+              checked={remember}
+              onChange={(e) => setRemember(e.target.checked)}
+            />
+            <span>Keep me signed in</span>
           </label>
-        </p>
-        <div className="auth-row">
-          <label className="auth-check">
-            <input type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} />
-            Keep me signed in
-          </label>
-          <Link to="/forgot-password">Forgot password?</Link>
+          <Link to="/forgot-password" className="step-auth-link">
+            Forgot password?
+          </Link>
         </div>
-        <button type="submit">Log in</button>
+
+        <button type="submit" className="step-btn-primary">
+          LOG IN
+        </button>
       </form>
-      <p className="center auth-after">
-        Need an account? <Link to={`/register?role=${role}`}>Sign up</Link>
-      </p>
-      <p className="center"><Link to="/">Choose a different role</Link></p>
+
+      <div className="step-auth-footer">
+        <p>
+          No account yet?{' '}
+          <Link to={`/register?role=${role}`} className="step-auth-link">
+            Register
+          </Link>
+        </p>
+        <p>
+          <Link to="/" className="step-auth-link step-auth-link--muted">
+            ← Back
+          </Link>
+        </p>
+      </div>
     </AuthLayout>
   )
 }

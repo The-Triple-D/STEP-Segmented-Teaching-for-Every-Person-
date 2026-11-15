@@ -9,7 +9,11 @@ export default function Register() {
   const [params] = useSearchParams()
   const role = params.get('role')
   const [form, setForm] = useState({
-    firstName: '', lastName: '', email: '', password: '', confirm: '',
+    firstName: '',
+    lastName: '',
+    email: '',
+    password: '',
+    confirm: '',
   })
   const [error, setError] = useState('')
 
@@ -33,21 +37,99 @@ export default function Register() {
   const label = role === 'student' ? 'Student' : 'Instructor'
 
   return (
-    <AuthLayout>
-      <h1>{label} sign up</h1>
-      {error && <p role="alert">{error}</p>}
-      <form onSubmit={submit}>
-        <p><label>First name<input name="firstName" value={form.firstName} onChange={update} required autoComplete="given-name" /></label></p>
-        <p><label>Last name<input name="lastName" value={form.lastName} onChange={update} required autoComplete="family-name" /></label></p>
-        <p><label>University email<input name="email" type="email" value={form.email} onChange={update} placeholder="example@email.com" required autoComplete="email" /></label></p>
-        <p><label>Password (8+ characters)<input name="password" type="password" value={form.password} onChange={update} required autoComplete="new-password" /></label></p>
-        <p><label>Confirm password<input name="confirm" type="password" value={form.confirm} onChange={update} required autoComplete="new-password" /></label></p>
-        <button type="submit">Create account</button>
+    <AuthLayout expanded>
+      <div className="step-auth-header">
+        <h2 className="step-auth-heading">{label} Register</h2>
+      </div>
+
+      {error && (
+        <p role="alert" className="step-auth-alert">
+          {error}
+        </p>
+      )}
+
+      <form onSubmit={submit} className="step-auth-form">
+        <div className="step-field-row">
+          <label className="step-field">
+            <span>First name</span>
+            <input
+              name="firstName"
+              value={form.firstName}
+              onChange={update}
+              required
+              autoComplete="given-name"
+            />
+          </label>
+
+          <label className="step-field">
+            <span>Last name</span>
+            <input
+              name="lastName"
+              value={form.lastName}
+              onChange={update}
+              required
+              autoComplete="family-name"
+            />
+          </label>
+        </div>
+
+        <label className="step-field">
+          <span>School email</span>
+          <input
+            name="email"
+            type="email"
+            value={form.email}
+            onChange={update}
+            placeholder="example@cit.edu"
+            required
+            autoComplete="email"
+          />
+        </label>
+
+        <label className="step-field">
+          <span>Password (8+ characters)</span>
+          <input
+            name="password"
+            type="password"
+            value={form.password}
+            onChange={update}
+            placeholder="••••••••"
+            required
+            autoComplete="new-password"
+          />
+        </label>
+
+        <label className="step-field">
+          <span>Confirm password</span>
+          <input
+            name="confirm"
+            type="password"
+            value={form.confirm}
+            onChange={update}
+            placeholder="••••••••"
+            required
+            autoComplete="new-password"
+          />
+        </label>
+
+        <button type="submit" className="step-btn-primary">
+          CREATE ACCOUNT
+        </button>
       </form>
-      <p className="center auth-after">
-        Already have an account? <Link to={`/login?role=${role}`}>Log in</Link>
-      </p>
-      <p className="center"><Link to="/">Choose a different role</Link></p>
+
+      <div className="step-auth-footer">
+        <p>
+          Already have an account?{' '}
+          <Link to={`/login?role=${role}`} className="step-auth-link">
+            Log in
+          </Link>
+        </p>
+        <p>
+          <Link to="/" className="step-auth-link step-auth-link--muted">
+            ← Back
+          </Link>
+        </p>
+      </div>
     </AuthLayout>
   )
 }
