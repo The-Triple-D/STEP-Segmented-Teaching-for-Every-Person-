@@ -12,4 +12,3 @@ export const courses = [
 export const lessons = []
 export const segments = []
 export const questions = []
-export const flashcards = []

@@ -8,7 +8,6 @@ import LessonList from './pages/LessonList.jsx'
 import LessonPage from './pages/LessonPage.jsx'
 import SegmentView from './pages/SegmentView.jsx'
 import CheckIn from './pages/CheckIn.jsx'
-import Flashcards from './pages/Flashcards.jsx'
 import Progress from './pages/Progress.jsx'
 import Settings from './pages/Settings.jsx'
 import Register from './pages/Register.jsx'
@@ -34,7 +33,6 @@ export default function App() {
         <Route path="/lessons/:id" element={<LessonPage />} />
         <Route path="/segments/:id" element={<SegmentView />} />
         <Route path="/checkin/:id" element={<CheckIn />} />
-        <Route path="/flashcards/:id" element={<Flashcards />} />
         <Route path="/progress" element={<Progress />} />
         <Route path="/settings" element={<Settings />} />
         <Route element={<ProtectedRoute />}>
