@@ -1,6 +1,7 @@
 package com.csit321G6.tripleD.step.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -33,6 +34,11 @@ public class SegmentEntity {
     private Double endTime;
     private Integer wordCount; 
     private Integer estimatedMinutes;
+
+    @JsonProperty(value = "lessonId", access = JsonProperty.Access.READ_ONLY)
+    public String getLessonId() {
+        return lesson == null ? null : lesson.getId();
+    }
 
     public String getId() { 
         return id; 
