@@ -88,7 +88,6 @@ public class UserService {
         return "User " + id + " is successfully deleted!";
     }
 
-    // Trims text, lowercases the email, and turns missing flags into false
     private void prepare(UserEntity u) {
         if (u.getFirstName() != null) u.setFirstName(u.getFirstName().trim());
         if (u.getLastName() != null) u.setLastName(u.getLastName().trim());

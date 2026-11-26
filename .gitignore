@@ -5,7 +5,8 @@ target/
 # Node / React
 node_modules/
 dist/
-build/
+.env
+*.log
 
 # Environment and secrets
 .env

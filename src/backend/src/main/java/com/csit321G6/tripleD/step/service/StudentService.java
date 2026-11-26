@@ -15,7 +15,6 @@ import com.csit321G6.tripleD.step.repository.UserRepository;
 @Service
 public class StudentService {
 
-    // CHANGE THIS to match the real school ID format (example: 23-1234-567)
     private static final String SCHOOL_ID_FORMAT = "^\\d{2}-\\d{4}-\\d{3}$";
 
     @Autowired
@@ -31,10 +30,11 @@ public class StudentService {
         if (!Boolean.TRUE.equals(user.getIsStudent())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This user is not flagged as a student");
         }
+        
         if (student.getId() == null || !student.getId().trim().matches(SCHOOL_ID_FORMAT)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                "A valid school ID is required as the student id");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid School ID (e.g., 23-1234-567)");
         }
+        
         student.setId(student.getId().trim());
         validateStreak(student);
 
