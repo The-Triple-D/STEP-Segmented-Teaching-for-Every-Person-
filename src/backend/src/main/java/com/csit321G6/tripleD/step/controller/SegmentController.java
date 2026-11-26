@@ -3,6 +3,7 @@ package com.csit321G6.tripleD.step.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.csit321G6.tripleD.step.entity.SegmentEntity;
@@ -24,6 +26,19 @@ public class SegmentController {
 
     @Autowired
     SegmentService sserv;
+
+    public record ChunkLessonRequest(String text, Integer wordsPerChunk) {}
+
+    @PostMapping("/chunkLesson/{lessonId}")
+    @ResponseStatus(HttpStatus.CREATED)
+    public List<SegmentEntity> chunkLesson(
+            @PathVariable String lessonId,
+            @RequestBody ChunkLessonRequest request
+    ) {
+        String text = request != null ? request.text() : null;
+        Integer wordsPerChunk = request != null ? request.wordsPerChunk() : null;
+        return sserv.chunkLessonText(lessonId, text, wordsPerChunk);
+    }
 
     @PostMapping("/postNewSegment/{lessonId}")
     public SegmentEntity postSegment(@PathVariable String lessonId, @RequestBody SegmentEntity segment) {

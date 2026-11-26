@@ -1,5 +1,7 @@
 package com.csit321G6.tripleD.step.service;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -88,5 +90,45 @@ public class SegmentService {
         if (segment.getEstimatedMinutes() == null) {
             segment.setEstimatedMinutes(Math.max(1, (int) Math.ceil(words / 200.0)));
         }
+    }
+
+
+    public List<SegmentEntity> chunkLessonText(String lessonId, String rawText, Integer targetWordsPerChunk) {
+        if (rawText == null || rawText.trim().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Text to chunk cannot be empty.");
+        }
+
+        LessonEntity lesson = lessonRepository.findById(lessonId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Lesson not found with id: " + lessonId));
+
+        int maxWords = (targetWordsPerChunk == null || targetWordsPerChunk < 50)
+                ? 250
+                : targetWordsPerChunk;
+
+        String[] words = rawText.trim().split("\\s+");
+        List<SegmentEntity> createdSegments = new ArrayList<>();
+
+        int order = 1;
+        int index = 0;
+
+        while (index < words.length) {
+            int end = Math.min(index + maxWords, words.length);
+            String chunkText = String.join(" ", Arrays.copyOfRange(words, index, end));
+            int chunkWordCount = end - index;
+            int estimatedMinutes = Math.max(1, (int) Math.ceil(chunkWordCount / 200.0));
+
+            SegmentEntity segment = new SegmentEntity();
+            segment.setLesson(lesson);
+            segment.setOrderIndex(order++);
+            segment.setText(chunkText);
+            segment.setWordCount(chunkWordCount);
+            segment.setEstimatedMinutes(estimatedMinutes);
+
+            createdSegments.add(segmentRepository.save(segment));
+            index = end;
+        }
+
+        return createdSegments;
     }
 }
