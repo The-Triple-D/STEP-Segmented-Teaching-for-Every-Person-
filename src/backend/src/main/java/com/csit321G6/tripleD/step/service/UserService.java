@@ -38,6 +38,19 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    public UserEntity loginUser(String email, String passwordHash) {
+        String normalizedEmail = email == null ? "" : email.trim().toLowerCase();
+        if (isBlank(normalizedEmail) || isBlank(passwordHash)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email and password are required");
+        }
+        UserEntity user = userRepository.findByEmail(normalizedEmail).orElseThrow(() ->
+            new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password"));
+        if (!passwordHash.equals(user.getPasswordHash())) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password");
+        }
+        return user;
+    }
+
     public List<UserEntity> getAllUsers() {
         return userRepository.findAll();
     }

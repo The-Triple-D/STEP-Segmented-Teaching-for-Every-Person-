@@ -30,6 +30,11 @@ public class UserController {
         return userService.createUser(user);
     }
 
+    @PostMapping("/login")
+    public UserEntity login(@RequestBody UserEntity loginRequest) {
+        return userService.loginUser(loginRequest.getEmail(), loginRequest.getPasswordHash());
+    }
+
     @GetMapping("/getAllUsers")
     public List<UserEntity> getAllUsers() {
         return userService.getAllUsers();
