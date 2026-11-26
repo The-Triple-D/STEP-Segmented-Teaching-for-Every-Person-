@@ -56,10 +56,14 @@ function publicUser(u) {
 async function parseError(res, fallbackMessage) {
   try {
     const data = await res.json()
-    return data.message || data.error || fallbackMessage
+    if (data.message && data.message !== 'No message available') {
+      return data.message
+    }
   } catch {
-    return fallbackMessage
   }
+  if (res.status === 409) return 'An account with this email is already registered.'
+  if (res.status === 401) return 'Invalid email or password.'
+  return fallbackMessage
 }
 
 export default function AuthProvider({ children }) {

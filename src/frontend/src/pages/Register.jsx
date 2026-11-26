@@ -26,7 +26,7 @@ export default function Register() {
     setError('')
     if (form.password.length < 8) return setError('Password must be at least 8 characters.')
     if (form.password !== form.confirm) return setError('Passwords do not match.')
-    const result = register({ ...form, role })
+    const result = await register({ ...form, role })
     if (!result.ok) return setError(result.error)
     navigate('/courses')
   }

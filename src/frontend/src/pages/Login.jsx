@@ -17,7 +17,7 @@ export default function Login() {
   async function submit(e) {
     e.preventDefault()
     setError('')
-    const result = login(email, password, role, remember)
+    const result = await login(email, password, role, remember)
     if (!result.ok) return setError(result.error)
     navigate(location.state?.from || '/courses', { replace: true })
   }
