@@ -18,13 +18,13 @@ export default function EditAccount() {
     setForm({ ...form, [e.target.name]: e.target.value })
   }
 
-  function submit(e) {
+  async function submit(e) {
     e.preventDefault()
     setMessage('')
     if (form.newPassword && form.newPassword.length < 8) {
       return setError('New password must be at least 8 characters.')
     }
-    const result = updateAccount(form)
+    const result = await updateAccount(form)
     if (!result.ok) return setError(result.error)
     setError('')
     setMessage('Account updated.')

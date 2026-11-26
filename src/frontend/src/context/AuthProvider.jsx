@@ -69,8 +69,9 @@ async function parseError(res, fallbackMessage) {
 export default function AuthProvider({ children }) {
   const [user, setUser] = useState(() => publicUser(readStoredUser()))
 
-  async function register({ firstName, lastName, email, password, role }) {
+  async function register({ firstName, lastName, schoolId, email, password, role }) {
     const cleanEmail = email.trim().toLowerCase()
+    const cleanId = (schoolId ?? '').trim()
     const payload = {
       firstName: firstName.trim(),
       lastName: lastName.trim(),
@@ -91,10 +92,36 @@ export default function AuthProvider({ children }) {
         const message = await parseError(res, 'Could not create account.')
         return { ok: false, error: message }
       }
-      const created = publicUser(await res.json())
-      writeSession(created, true)
-      setUser(created)
-      return { ok: true, user: created }
+      const rawCreated = await res.json()
+      const created = publicUser(rawCreated)
+
+      if (role === 'student' || role === 'instructor') {
+        const roleUrl =
+          role === 'student'
+            ? `http://localhost:8080/student/api/createStudent/${encodeURIComponent(rawCreated.id)}`
+            : `http://localhost:8080/instructor/api/createInstructor/${encodeURIComponent(rawCreated.id)}`
+
+        const roleRes = await fetch(roleUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: cleanId }),
+        })
+
+        if (!roleRes.ok) {
+          const roleError = await parseError(
+            roleRes,
+            role === 'student'
+              ? 'Account created, but could not save student profile.'
+              : 'Account created, but could not save instructor profile.'
+          )
+          return { ok: false, error: roleError }
+        }
+      }
+
+      const sessionUser = { ...created, profileId: cleanId || created.profileId }
+      writeSession(sessionUser, true)
+      setUser(sessionUser)
+      return { ok: true, user: sessionUser }
     } catch {
       return { ok: false, error: 'Unable to reach the server. Check if the backend is running.' }
     }
@@ -157,19 +184,42 @@ export default function AuthProvider({ children }) {
     return { ok: true }
   }
 
-  function updateAccount({ firstName, lastName, email, currentPassword, newPassword }) {
+  async function updateAccount({ firstName, lastName, email, currentPassword, newPassword }) {
     if (!user) return { ok: false, error: 'Account not found.' }
     const cleanEmail = email.trim().toLowerCase()
-    const updated = {
-      ...user,
+
+    const payload = {
       firstName: firstName.trim(),
       lastName: lastName.trim(),
       email: cleanEmail,
-      password: newPassword || user.password,
+      isStudent: Boolean(user.isStudent),
+      isInstructor: Boolean(user.isInstructor),
+      isAdmin: Boolean(user.isAdmin),
+      ...(newPassword ? { passwordHash: newPassword } : {}),
     }
-    writeSession(updated, Boolean(localStorage.getItem(SESSION_KEY)))
-    setUser(updated)
-    return { ok: true }
+
+    try {
+      const res = await fetch(`${API_BASE}/putUser?id=${encodeURIComponent(user.id)}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+      if (!res.ok) {
+        const message = await parseError(res, 'Could not update account.')
+        return { ok: false, error: message }
+      }
+      const updatedFromServer = await res.json()
+      const updated = {
+        ...publicUser(updatedFromServer),
+        profileId: user.profileId ?? null,
+      }
+      const remember = Boolean(localStorage.getItem(SESSION_KEY))
+      writeSession(updated, remember)
+      setUser(updated)
+      return { ok: true, user: updated }
+    } catch {
+      return { ok: false, error: 'Unable to reach the server. Check if the backend is running.' }
+    }
   }
 
   const value = { user, register, login, logout, requestReset, resetPassword, updateAccount }
