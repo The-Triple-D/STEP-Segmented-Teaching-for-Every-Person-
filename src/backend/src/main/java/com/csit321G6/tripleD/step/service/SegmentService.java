@@ -46,7 +46,7 @@ public class SegmentService {
         if (!lessonRepository.existsById(lessonId)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lesson " + lessonId + " does not exist");
         }
-        return segmentRepository.findByLessonIdOrderByOrderIndexAsc(lessonId);
+        return segmentRepository.findByLesson_IdOrderByOrderIndexAsc(lessonId);
     }
 
     public SegmentEntity updateSegment(String id, SegmentEntity details) {

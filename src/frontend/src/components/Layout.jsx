@@ -1,4 +1,4 @@
-import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
+  import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import AccessibilityBar from './AccessibilityBar.jsx'
 import ThemeToggle from './ThemeToggle.jsx'
 import { useAuth } from '../context/useAuth.js'
@@ -20,7 +20,7 @@ export default function Layout() {
     <>
       <header>
         <nav aria-label="Main">
-          <Link to="/">Home</Link>
+          <Link to={user ? '/dashboard' : '/'}>Home</Link>
           <Link to="/courses">Courses</Link>
           <Link to="/progress">Progress</Link>
           <Link to="/settings">Settings</Link>
@@ -30,13 +30,13 @@ export default function Layout() {
               <button type="button" onClick={handleLogout}>Log out</button>
             </>
           )}
-          <ThemeToggle />
         </nav>
         <AccessibilityBar />
       </header>
       <main className={authPage ? 'auth-main' : undefined}>
         <Outlet />
       </main>
+      <ThemeToggle />
     </>
   )
 }
