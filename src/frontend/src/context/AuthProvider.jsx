@@ -69,9 +69,8 @@ async function parseError(res, fallbackMessage) {
 export default function AuthProvider({ children }) {
   const [user, setUser] = useState(() => publicUser(readStoredUser()))
 
-  async function register({ firstName, lastName, schoolId, email, password, role }) {
+  async function register({ firstName, lastName, email, password, role }) {
     const cleanEmail = email.trim().toLowerCase()
-    const cleanId = (schoolId ?? '').trim()
     const payload = {
       firstName: firstName.trim(),
       lastName: lastName.trim(),
@@ -92,36 +91,10 @@ export default function AuthProvider({ children }) {
         const message = await parseError(res, 'Could not create account.')
         return { ok: false, error: message }
       }
-      const rawCreated = await res.json()
-      const created = publicUser(rawCreated)
-
-      if (role === 'student' || role === 'instructor') {
-        const roleUrl =
-          role === 'student'
-            ? `http://localhost:8080/student/api/createStudent/${encodeURIComponent(rawCreated.id)}`
-            : `http://localhost:8080/instructor/api/createInstructor/${encodeURIComponent(rawCreated.id)}`
-
-        const roleRes = await fetch(roleUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id: cleanId }),
-        })
-
-        if (!roleRes.ok) {
-          const roleError = await parseError(
-            roleRes,
-            role === 'student'
-              ? 'Account created, but could not save student profile.'
-              : 'Account created, but could not save instructor profile.'
-          )
-          return { ok: false, error: roleError }
-        }
-      }
-
-      const sessionUser = { ...created, profileId: cleanId || created.profileId }
-      writeSession(sessionUser, true)
-      setUser(sessionUser)
-      return { ok: true, user: sessionUser }
+      const created = publicUser(await res.json())
+      writeSession(created, true)
+      setUser(created)
+      return { ok: true, user: created }
     } catch {
       return { ok: false, error: 'Unable to reach the server. Check if the backend is running.' }
     }
@@ -161,27 +134,38 @@ export default function AuthProvider({ children }) {
     setUser(null)
   }
 
-  function requestReset(email) {
-    const users = read(USER_KEY, [])
-    const found = users.find((u) => u.email === email.trim().toLowerCase())
-    if (!found) return { ok: true, token: null }
-    const token = crypto.randomUUID()
-    write(TOKENS_KEY, { ...read(TOKENS_KEY, {}), [token]: found.id })
-    return { ok: true, token }
+  async function requestReset(email) {
+    try {
+      const res = await fetch(`${API_BASE}/forgotPassword`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim().toLowerCase() }),
+      })
+      if (!res.ok) {
+        return { ok: true, token: null }
+      }
+      const data = await res.json()
+      return { ok: true, token: data.token || null }
+    } catch {
+      return { ok: false, token: null }
+    }
   }
 
-  function resetPassword(token, newPassword) {
-    const tokens = read(TOKENS_KEY, {})
-    const userId = tokens[token]
-    if (!userId) return { ok: false, error: 'This reset link is invalid or already used.' }
-    write(
-      USER_KEY,
-      read(USER_KEY, []).map((u) => (u.id === userId ? { ...u, password: newPassword } : u))
-    )
-    const rest = { ...tokens }
-    delete rest[token]
-    write(TOKENS_KEY, rest)
-    return { ok: true }
+  async function resetPassword(token, newPassword) {
+    try {
+      const res = await fetch(`${API_BASE}/resetPassword`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token, newPassword }),
+      })
+      if (!res.ok) {
+        const message = await parseError(res, 'This reset link is invalid or already used.')
+        return { ok: false, error: message }
+      }
+      return { ok: true }
+    } catch {
+      return { ok: false, error: 'Unable to reach the server. Check if the backend is running.' }
+    }
   }
 
   async function updateAccount({ firstName, lastName, email, currentPassword, newPassword }) {

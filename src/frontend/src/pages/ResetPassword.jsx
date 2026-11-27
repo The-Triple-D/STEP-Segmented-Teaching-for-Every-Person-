@@ -11,11 +11,11 @@ export default function ResetPassword() {
   const [error, setError] = useState('')
   const [done, setDone] = useState(false)
 
-  function submit(e) {
+  async function submit(e) {
     e.preventDefault()
     if (password.length < 8) return setError('Password must be at least 8 characters.')
     if (password !== confirm) return setError('Passwords do not match.')
-    const result = resetPassword(token, password)
+    const result = await resetPassword(token, password)
     if (!result.ok) return setError(result.error)
     setError('')
     setDone(true)
