@@ -37,7 +37,6 @@ public class InstructorService {
                 "This user already has an instructor profile");
         }
 
-        instructor.setId(null);
         instructor.setUser(user);
         return instructorRepository.save(instructor);
     }

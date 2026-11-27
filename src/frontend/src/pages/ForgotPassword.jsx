@@ -10,16 +10,16 @@ export default function ForgotPassword() {
   const [token, setToken] = useState(null)
   const [resent, setResent] = useState(false)
 
-  function submit(e) {
+  async function submit(e) {
     e.preventDefault()
-    const result = requestReset(email)
+    const result = await requestReset(email)
     setToken(result?.token || null)
     setSent(true)
     setResent(false)
   }
 
-  function handleResend() {
-    const result = requestReset(email)
+  async function handleResend() {
+    const result = await requestReset(email)
     setToken(result?.token || null)
     setResent(true)
   }
@@ -62,7 +62,6 @@ export default function ForgotPassword() {
         </>
       ) : (
         <div style={{ textAlign: 'center' }}>
-          {/* Clean Envelope Icon Badge */}
           <div
             aria-hidden="true"
             style={{

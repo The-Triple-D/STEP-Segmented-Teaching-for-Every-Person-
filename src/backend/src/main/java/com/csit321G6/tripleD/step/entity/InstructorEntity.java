@@ -9,7 +9,6 @@ import jakarta.persistence.*;
 public class InstructorEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
     @OneToOne

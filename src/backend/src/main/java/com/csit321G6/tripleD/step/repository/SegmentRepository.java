@@ -9,5 +9,5 @@ import com.csit321G6.tripleD.step.entity.SegmentEntity;
 
 @Repository
 public interface SegmentRepository extends JpaRepository<SegmentEntity, String> {
-    List<SegmentEntity> findByLessonIdOrderByOrderIndexAsc(String lessonId);
+    List<SegmentEntity> findByLesson_IdOrderByOrderIndexAsc(String lessonId);
 }

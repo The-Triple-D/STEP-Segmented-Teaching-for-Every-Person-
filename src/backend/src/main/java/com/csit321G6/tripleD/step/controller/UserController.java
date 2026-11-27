@@ -1,6 +1,8 @@
 package com.csit321G6.tripleD.step.controller;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -28,6 +30,23 @@ public class UserController {
     @PostMapping("/createUser")
     public UserEntity createUser(@RequestBody UserEntity user) {
         return userService.createUser(user);
+    }
+
+    @PostMapping("/login")
+    public UserEntity login(@RequestBody UserEntity loginRequest) {
+        return userService.loginUser(loginRequest.getEmail(), loginRequest.getPasswordHash());
+    }
+
+    @PostMapping("/forgotPassword")
+    public Map<String, String> forgotPassword(@RequestBody Map<String, String> request) {
+        String token = userService.requestPasswordReset(request.get("email"));
+        return Collections.singletonMap("token", token);
+    }
+
+    @PostMapping("/resetPassword")
+    public Map<String, String> resetPassword(@RequestBody Map<String, String> request) {
+        userService.resetPassword(request.get("token"), request.get("newPassword"));
+        return Collections.singletonMap("message", "Password updated successfully.");
     }
 
     @GetMapping("/getAllUsers")
