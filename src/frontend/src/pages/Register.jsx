@@ -21,11 +21,12 @@ export default function Register() {
     setForm({ ...form, [e.target.name]: e.target.value })
   }
 
-  function submit(e) {
+  async function submit(e) {
     e.preventDefault()
+    setError('')
     if (form.password.length < 8) return setError('Password must be at least 8 characters.')
     if (form.password !== form.confirm) return setError('Passwords do not match.')
-    const result = register({ ...form, role })
+    const result = await register({ ...form, role })
     if (!result.ok) return setError(result.error)
     navigate('/courses')
   }

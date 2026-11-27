@@ -1,7 +1,10 @@
 package com.csit321G6.tripleD.step.service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,6 +30,35 @@ public class UserService {
     @Autowired
     private InstructorRepository instructorRepository;
 
+    private final Map<String, String> resetTokens = new ConcurrentHashMap<>();
+
+    public String requestPasswordReset(String email) {
+        String normalizedEmail = email == null ? "" : email.trim().toLowerCase();
+        if (isBlank(normalizedEmail)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email is required");
+        }
+        Optional<UserEntity> userOpt = userRepository.findByEmail(normalizedEmail);
+        if (userOpt.isEmpty()) {
+            return null;
+        }
+        String token = UUID.randomUUID().toString();
+        resetTokens.put(token, userOpt.get().getId());
+        return token;
+    }
+
+    public void resetPassword(String token, String newPassword) {
+        if (isBlank(token) || isBlank(newPassword)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Token and new password are required");
+        }
+        String userId = resetTokens.remove(token.trim());
+        if (userId == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This reset link is invalid or already used.");
+        }
+        UserEntity user = getUserById(userId);
+        user.setPasswordHash(newPassword);
+        userRepository.save(user);
+    }
+
     public UserEntity createUser(UserEntity user) {
         prepare(user);
         validate(user, true);
@@ -36,6 +68,19 @@ public class UserService {
         }
         user.setId(null);
         return userRepository.save(user);
+    }
+
+    public UserEntity loginUser(String email, String passwordHash) {
+        String normalizedEmail = email == null ? "" : email.trim().toLowerCase();
+        if (isBlank(normalizedEmail) || isBlank(passwordHash)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email and password are required");
+        }
+        UserEntity user = userRepository.findByEmail(normalizedEmail).orElseThrow(() ->
+            new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password"));
+        if (!passwordHash.equals(user.getPasswordHash())) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password");
+        }
+        return user;
     }
 
     public List<UserEntity> getAllUsers() {
