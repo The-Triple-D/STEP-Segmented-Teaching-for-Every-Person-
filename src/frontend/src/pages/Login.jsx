@@ -9,15 +9,17 @@ export default function Login() {
   const location = useLocation()
   const [params] = useSearchParams()
   const role = params.get('role')
-  const [email, setEmail] = useState('')
+  const [identifier, setIdentifier] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [remember, setRemember] = useState(false)
   const [error, setError] = useState('')
+  const justRegistered = Boolean(location.state?.registered)
 
   async function submit(e) {
     e.preventDefault()
     setError('')
-    const result = await login(email, password, role, remember)
+    const result = await login(identifier, password, role, remember)
     if (!result.ok) return setError(result.error)
     navigate(location.state?.from || '/courses', { replace: true })
   }
@@ -34,6 +36,12 @@ export default function Login() {
         <h2 className="step-auth-heading">{label} Log in</h2>
       </div>
 
+      {justRegistered && !error && (
+        <p role="status" className="step-auth-status">
+          Account created! Please log in to continue.
+        </p>
+      )}
+
       {error && (
         <p role="alert" className="step-auth-alert">
           {error}
@@ -42,27 +50,38 @@ export default function Login() {
 
       <form onSubmit={submit} className="step-auth-form">
         <label className="step-field">
-          <span>School email</span>
+          <span>Email Address / ID Number</span>
           <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="example@cit.edu"
+            type="text"
+            value={identifier}
+            onChange={(e) => setIdentifier(e.target.value)}
+            placeholder="example@cit.edu or 12-3456-789"
             required
-            autoComplete="email"
+            autoComplete="username"
           />
         </label>
 
         <label className="step-field">
           <span>Password</span>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="••••••••"
-            required
-            autoComplete="current-password"
-          />
+          <div className="step-password-wrap">
+            <input
+              type={showPassword ? 'text' : 'password'}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+              required
+              autoComplete="current-password"
+            />
+            <button
+              type="button"
+              className="step-password-toggle"
+              onClick={() => setShowPassword((prev) => !prev)}
+              aria-pressed={showPassword}
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+            >
+              {showPassword ? 'Hide' : 'Show'}
+            </button>
+          </div>
         </label>
 
         <div className="step-auth-row">

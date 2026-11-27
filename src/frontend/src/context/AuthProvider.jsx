@@ -1,23 +1,8 @@
 import { useState } from 'react'
 import { AuthContext } from './authContext.js'
 
-const USER_KEY = 'step_user'
 const SESSION_KEY = 'step_session'
-const TOKENS_KEY = 'step_reset_tokens'
 const API_BASE = 'http://localhost:8080/user/api'
-
-function read(key, fallback) {
-  try {
-    const raw = localStorage.getItem(key)
-    return raw ? JSON.parse(raw) : fallback
-  } catch {
-    return fallback
-  }
-}
-
-function write(key, value) {
-  localStorage.setItem(key, JSON.stringify(value))
-}
 
 function readStoredUser() {
   try {
@@ -43,6 +28,7 @@ function publicUser(u) {
   const role = u.role || (isInstructor ? 'instructor' : isStudent ? 'student' : 'user')
   return {
     id: u.id,
+    schoolId: u.schoolId || '',
     firstName: u.firstName,
     lastName: u.lastName,
     email: u.email,
@@ -61,15 +47,15 @@ async function parseError(res, fallbackMessage) {
     }
   } catch {
   }
-  if (res.status === 409) return 'An account with this email is already registered.'
-  if (res.status === 401) return 'Invalid email or password.'
+  if (res.status === 409) return 'An account with this email or school ID is already registered.'
+  if (res.status === 401) return 'Invalid email/ID or password.'
   return fallbackMessage
 }
 
 export default function AuthProvider({ children }) {
   const [user, setUser] = useState(() => publicUser(readStoredUser()))
 
-  async function register({ firstName, lastName, email, password, role }) {
+    async function register({ firstName, lastName, email, password, role }) {
     const cleanEmail = email.trim().toLowerCase()
     const payload = {
       firstName: firstName.trim(),
@@ -92,25 +78,23 @@ export default function AuthProvider({ children }) {
         return { ok: false, error: message }
       }
       const created = publicUser(await res.json())
-      writeSession(created, true)
-      setUser(created)
       return { ok: true, user: created }
     } catch {
       return { ok: false, error: 'Unable to reach the server. Check if the backend is running.' }
     }
   }
 
-  async function login(email, password, role, remember = false) {
-    const cleanEmail = email.trim().toLowerCase()
+  async function login(identifier, password, role, remember = false) {
+    const cleanIdentifier = identifier.trim()
 
     try {
       const res = await fetch(`${API_BASE}/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: cleanEmail, passwordHash: password }),
+        body: JSON.stringify({ email: cleanIdentifier, passwordHash: password }),
       })
       if (!res.ok) {
-        const message = await parseError(res, 'Incorrect email or password.')
+        const message = await parseError(res, 'Invalid email/ID or password.')
         return { ok: false, error: message }
       }
       const found = publicUser(await res.json())
@@ -168,14 +152,16 @@ export default function AuthProvider({ children }) {
     }
   }
 
-  async function updateAccount({ firstName, lastName, email, currentPassword, newPassword }) {
+  async function updateAccount({ firstName, lastName, email, schoolId, currentPassword, newPassword }) {
     if (!user) return { ok: false, error: 'Account not found.' }
     const cleanEmail = email.trim().toLowerCase()
+    const cleanSchoolId = schoolId ? schoolId.trim() : null
 
     const payload = {
       firstName: firstName.trim(),
       lastName: lastName.trim(),
       email: cleanEmail,
+      schoolId: cleanSchoolId || null,
       isStudent: Boolean(user.isStudent),
       isInstructor: Boolean(user.isInstructor),
       isAdmin: Boolean(user.isAdmin),

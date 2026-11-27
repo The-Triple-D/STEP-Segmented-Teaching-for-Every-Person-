@@ -8,6 +8,7 @@ export default function EditAccount() {
     firstName: user.firstName,
     lastName: user.lastName,
     email: user.email,
+    schoolId: user.schoolId || '',
     currentPassword: '',
     newPassword: '',
   })
@@ -40,6 +41,7 @@ export default function EditAccount() {
         <p><label>First name<input name="firstName" value={form.firstName} onChange={update} required /></label></p>
         <p><label>Last name<input name="lastName" value={form.lastName} onChange={update} required /></label></p>
         <p><label>University email<input name="email" type="email" value={form.email} onChange={update} required /></label></p>
+        <p><label>School ID (optional)<input name="schoolId" type="text" value={form.schoolId} onChange={update} placeholder="e.g. 24-1234-567" /></label></p>
         <h2>Change password (optional)</h2>
         <p><label>Current password<input name="currentPassword" type="password" value={form.currentPassword} onChange={update} autoComplete="current-password" /></label></p>
         <p><label>New password<input name="newPassword" type="password" value={form.newPassword} onChange={update} autoComplete="new-password" /></label></p>

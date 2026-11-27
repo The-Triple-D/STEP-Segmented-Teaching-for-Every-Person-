@@ -15,6 +15,8 @@ export default function Register() {
     password: '',
     confirm: '',
   })
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirm, setShowConfirm] = useState(false)
   const [error, setError] = useState('')
 
   function update(e) {
@@ -28,7 +30,7 @@ export default function Register() {
     if (form.password !== form.confirm) return setError('Passwords do not match.')
     const result = await register({ ...form, role })
     if (!result.ok) return setError(result.error)
-    navigate('/courses')
+    navigate(`/login?role=${role}`, { replace: true, state: { registered: true } })
   }
 
   if (role !== 'student' && role !== 'instructor') {
@@ -89,28 +91,50 @@ export default function Register() {
 
         <label className="step-field">
           <span>Password (8+ characters)</span>
-          <input
-            name="password"
-            type="password"
-            value={form.password}
-            onChange={update}
-            placeholder="••••••••"
-            required
-            autoComplete="new-password"
-          />
+          <div className="step-password-wrap">
+            <input
+              name="password"
+              type={showPassword ? 'text' : 'password'}
+              value={form.password}
+              onChange={update}
+              placeholder="••••••••"
+              required
+              autoComplete="new-password"
+            />
+            <button
+              type="button"
+              className="step-password-toggle"
+              onClick={() => setShowPassword((prev) => !prev)}
+              aria-pressed={showPassword}
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+            >
+              {showPassword ? 'Hide' : 'Show'}
+            </button>
+          </div>
         </label>
 
         <label className="step-field">
           <span>Confirm password</span>
-          <input
-            name="confirm"
-            type="password"
-            value={form.confirm}
-            onChange={update}
-            placeholder="••••••••"
-            required
-            autoComplete="new-password"
-          />
+          <div className="step-password-wrap">
+            <input
+              name="confirm"
+              type={showConfirm ? 'text' : 'password'}
+              value={form.confirm}
+              onChange={update}
+              placeholder="••••••••"
+              required
+              autoComplete="new-password"
+            />
+            <button
+              type="button"
+              className="step-password-toggle"
+              onClick={() => setShowConfirm((prev) => !prev)}
+              aria-pressed={showConfirm}
+              aria-label={showConfirm ? 'Hide confirm password' : 'Show confirm password'}
+            >
+              {showConfirm ? 'Hide' : 'Show'}
+            </button>
+          </div>
         </label>
 
         <button type="submit" className="step-btn-primary">

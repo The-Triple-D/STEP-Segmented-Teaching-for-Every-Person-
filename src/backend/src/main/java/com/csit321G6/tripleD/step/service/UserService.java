@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.csit321G6.tripleD.step.entity.StudentEntity;
 import com.csit321G6.tripleD.step.entity.UserEntity;
 import com.csit321G6.tripleD.step.repository.InstructorRepository;
 import com.csit321G6.tripleD.step.repository.StudentRepository;
@@ -66,19 +67,36 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
                 "Email " + user.getEmail() + " is already registered");
         }
+        if (!isBlank(user.getSchoolId()) && userRepository.existsBySchoolId(user.getSchoolId())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                "School ID " + user.getSchoolId() + " is already registered");
+        }
         user.setId(null);
-        return userRepository.save(user);
+
+        UserEntity savedUser = userRepository.save(user);
+
+        if (Boolean.TRUE.equals(savedUser.getIsStudent())) {
+            StudentEntity student = new StudentEntity();
+            student.setId(UUID.randomUUID().toString());
+            student.setUser(savedUser);
+            student.setCurrentStreak(0);
+            student.setLastStudyDate(null);
+            studentRepository.save(student);
+        }
+
+        return savedUser;
     }
 
-    public UserEntity loginUser(String email, String passwordHash) {
-        String normalizedEmail = email == null ? "" : email.trim().toLowerCase();
-        if (isBlank(normalizedEmail) || isBlank(passwordHash)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email and password are required");
+    public UserEntity loginUser(String identifier, String passwordHash) {
+        String cleanIdentifier = identifier == null ? "" : identifier.trim();
+        if (isBlank(cleanIdentifier) || isBlank(passwordHash)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email/ID and password are required");
         }
-        UserEntity user = userRepository.findByEmail(normalizedEmail).orElseThrow(() ->
-            new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password"));
+        UserEntity user = userRepository
+            .findByEmailOrSchoolId(cleanIdentifier.toLowerCase(), cleanIdentifier)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email/ID or password"));
         if (!passwordHash.equals(user.getPasswordHash())) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email/ID or password");
         }
         return user;
     }
@@ -102,6 +120,13 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
                 "Email " + details.getEmail() + " is already registered");
         }
+        if (!isBlank(details.getSchoolId())) {
+            Optional<UserEntity> sameSchoolId = userRepository.findBySchoolId(details.getSchoolId());
+            if (sameSchoolId.isPresent() && !sameSchoolId.get().getId().equals(id)) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "School ID " + details.getSchoolId() + " is already registered");
+            }
+        }
         if (!details.getIsStudent() && studentRepository.existsByUser_Id(id)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
                 "Delete this user's student profile before removing the student role");
@@ -114,6 +139,7 @@ public class UserService {
         user.setFirstName(details.getFirstName());
         user.setLastName(details.getLastName());
         user.setEmail(details.getEmail());
+        user.setSchoolId(details.getSchoolId());
         user.setIsStudent(details.getIsStudent());
         user.setIsInstructor(details.getIsInstructor());
         user.setIsAdmin(details.getIsAdmin());
@@ -137,6 +163,10 @@ public class UserService {
         if (u.getFirstName() != null) u.setFirstName(u.getFirstName().trim());
         if (u.getLastName() != null) u.setLastName(u.getLastName().trim());
         if (u.getEmail() != null) u.setEmail(u.getEmail().trim().toLowerCase());
+        if (u.getSchoolId() != null) {
+            String trimmedId = u.getSchoolId().trim();
+            u.setSchoolId(trimmedId.isEmpty() ? null : trimmedId);
+        }
         if (u.getIsStudent() == null) u.setIsStudent(false);
         if (u.getIsInstructor() == null) u.setIsInstructor(false);
         if (u.getIsAdmin() == null) u.setIsAdmin(false);

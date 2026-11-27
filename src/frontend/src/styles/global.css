@@ -92,6 +92,37 @@ body {
   outline-offset: 3px;
 }
 
+.step-password-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.step-password-wrap input {
+  width: 100%;
+  padding-right: 4rem;
+}
+
+.step-password-toggle {
+  position: absolute;
+  right: 0.75rem;
+  background: transparent;
+  border: none;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: inherit;
+  opacity: 0.8;
+  padding: 0.25rem 0.4rem;
+}
+
+.step-password-toggle:hover,
+.step-password-toggle:focus-visible {
+  opacity: 1;
+  text-decoration: underline;
+}
+
 @media (prefers-reduced-motion: reduce) {
   * {
     transition: none !important;
