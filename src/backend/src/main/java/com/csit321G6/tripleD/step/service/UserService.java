@@ -1,5 +1,8 @@
 package com.csit321G6.tripleD.step.service;
 
+import java.security.SecureRandom;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -7,7 +10,10 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -21,6 +27,7 @@ import com.csit321G6.tripleD.step.repository.UserRepository;
 public class UserService {
 
     private static final String EMAIL_FORMAT = "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$";
+    private static final SecureRandom RANDOM = new SecureRandom();
 
     @Autowired
     private UserRepository userRepository;
@@ -31,31 +38,121 @@ public class UserService {
     @Autowired
     private InstructorRepository instructorRepository;
 
-    private final Map<String, String> resetTokens = new ConcurrentHashMap<>();
+    @Autowired
+    private JavaMailSender mailSender;
 
-    public String requestPasswordReset(String email) {
+    @Value("${spring.mail.username:}")
+    private String mailFrom;
+
+    private record OtpEntry(String userId, String code, Instant expiresAt, Instant canResendAt) {}
+    private final Map<String, OtpEntry> resetOtps = new ConcurrentHashMap<>();
+
+    public void requestPasswordReset(String email) {
         String normalizedEmail = email == null ? "" : email.trim().toLowerCase();
-        if (isBlank(normalizedEmail)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email is required");
+        if (isBlank(normalizedEmail) || !normalizedEmail.matches(EMAIL_FORMAT)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "A valid email is required");
         }
+
+        OtpEntry existing = resetOtps.get(normalizedEmail);
+        if (existing != null && Instant.now().isBefore(existing.canResendAt())) {
+            long secondsLeft = Math.max(1, ChronoUnit.SECONDS.between(Instant.now(), existing.canResendAt()));
+            throw new ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS,
+                "Please wait " + secondsLeft + " seconds before requesting a new code.");
+        }
+
         Optional<UserEntity> userOpt = userRepository.findByEmail(normalizedEmail);
         if (userOpt.isEmpty()) {
-            return null;
+            return; // Avoid leaking whether an email exists
         }
-        String token = UUID.randomUUID().toString();
-        resetTokens.put(token, userOpt.get().getId());
-        return token;
+
+        if (isBlank(mailFrom)) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                "Email service is not configured (MAIL_USERNAME is missing)");
+        }
+
+        String code = String.format("%06d", RANDOM.nextInt(1_000_000));
+        Instant now = Instant.now();
+        resetOtps.put(normalizedEmail, new OtpEntry(
+            userOpt.get().getId(),
+            code,
+            now.plus(5, ChronoUnit.MINUTES),
+            now.plus(1, ChronoUnit.MINUTES)
+        ));
+
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom("STEP Learning <" + mailFrom + ">");
+            message.setTo(normalizedEmail);
+            message.setSubject("STEP Password Reset Verification Code");
+            message.setText(
+                "Hi " + userOpt.get().getFirstName() + ",\n\n" +
+                "Your STEP password reset verification code is:\n\n" +
+                "    " + code + "\n\n" +
+                "This code expires in 5 minutes. If you did not request a password reset, you can safely ignore this email."
+            );
+            mailSender.send(message);
+        } catch (Exception ex) {
+            resetOtps.remove(normalizedEmail);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                "Failed to send verification email. Check Gmail SMTP credentials.");
+        }
     }
 
-    public void resetPassword(String token, String newPassword) {
-        if (isBlank(token) || isBlank(newPassword)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Token and new password are required");
+    public void verifyOtp(String email, String otp) {
+        String normalizedEmail = email == null ? "" : email.trim().toLowerCase();
+        String cleanOtp = otp == null ? "" : otp.trim();
+
+        if (isBlank(normalizedEmail) || isBlank(cleanOtp)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                "Email and 6-digit verification code are required");
         }
-        String userId = resetTokens.remove(token.trim());
-        if (userId == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This reset link is invalid or already used.");
+
+        OtpEntry entry = resetOtps.get(normalizedEmail);
+        if (entry == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                "No active reset code found. Please request a new code.");
         }
-        UserEntity user = getUserById(userId);
+        if (Instant.now().isAfter(entry.expiresAt())) {
+            resetOtps.remove(normalizedEmail);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                "This verification code has expired. Please request a new one.");
+        }
+        if (!entry.code().equals(cleanOtp)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                "Invalid 6-digit verification code.");
+        }
+    }
+
+    public void resetPassword(String email, String otp, String newPassword) {
+        String normalizedEmail = email == null ? "" : email.trim().toLowerCase();
+        String cleanOtp = otp == null ? "" : otp.trim();
+
+        if (isBlank(normalizedEmail) || isBlank(cleanOtp) || isBlank(newPassword)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                "Email, 6-digit code, and new password are required");
+        }
+        if (newPassword.length() < 8) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                "New password must be at least 8 characters");
+        }
+
+        OtpEntry entry = resetOtps.get(normalizedEmail);
+        if (entry == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                "No active reset code found. Please request a new code.");
+        }
+        if (Instant.now().isAfter(entry.expiresAt())) {
+            resetOtps.remove(normalizedEmail);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                "This verification code has expired. Please request a new one.");
+        }
+        if (!entry.code().equals(cleanOtp)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                "Invalid 6-digit verification code.");
+        }
+
+        resetOtps.remove(normalizedEmail);
+        UserEntity user = getUserById(entry.userId());
         user.setPasswordHash(newPassword);
         userRepository.save(user);
     }

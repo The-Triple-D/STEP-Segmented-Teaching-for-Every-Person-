@@ -126,24 +126,48 @@ export default function AuthProvider({ children }) {
         body: JSON.stringify({ email: email.trim().toLowerCase() }),
       })
       if (!res.ok) {
-        return { ok: true, token: null }
+        const message = await parseError(res, 'Could not send verification code.')
+        return { ok: false, error: message }
       }
-      const data = await res.json()
-      return { ok: true, token: data.token || null }
+      return { ok: true }
     } catch {
-      return { ok: false, token: null }
+      return { ok: false, error: 'Unable to reach the server. Check if the backend is running.' }
     }
   }
 
-  async function resetPassword(token, newPassword) {
+  async function verifyOtp(email, otp) {
+    try {
+      const res = await fetch(`${API_BASE}/verifyOtp`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: email.trim().toLowerCase(),
+          otp: otp.trim(),
+        }),
+      })
+      if (!res.ok) {
+        const message = await parseError(res, 'Invalid or expired verification code.')
+        return { ok: false, error: message }
+      }
+      return { ok: true }
+    } catch {
+      return { ok: false, error: 'Unable to reach the server. Check if the backend is running.' }
+    }
+  }
+
+  async function resetPassword(email, otp, newPassword) {
     try {
       const res = await fetch(`${API_BASE}/resetPassword`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token, newPassword }),
+        body: JSON.stringify({
+          email: email.trim().toLowerCase(),
+          otp: otp.trim(),
+          newPassword,
+        }),
       })
       if (!res.ok) {
-        const message = await parseError(res, 'This reset link is invalid or already used.')
+        const message = await parseError(res, 'Invalid or expired verification code.')
         return { ok: false, error: message }
       }
       return { ok: true }
@@ -192,6 +216,6 @@ export default function AuthProvider({ children }) {
     }
   }
 
-  const value = { user, register, login, logout, requestReset, resetPassword, updateAccount }
+  const value = { user, register, login, logout, requestReset, verifyOtp, resetPassword, updateAccount }
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
