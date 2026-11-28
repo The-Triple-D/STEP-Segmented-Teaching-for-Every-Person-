@@ -1,0 +1,129 @@
+.settings-shell {
+  width: 100%;
+  padding: 2rem 1rem 5rem;
+}
+
+.settings-card {
+  width: 100%;
+  max-width: 42rem;
+  margin: 0 auto;
+  padding: clamp(1rem, 4vw, 2rem);
+  background: var(--surface-glass);
+  color: var(--page-text);
+  border: 1px solid var(--surface-border);
+  border-radius: 24px;
+}
+
+.settings-card h1 {
+  margin-top: 0;
+}
+
+.settings-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  min-width: 0;
+  margin: 1.5rem 0;
+  padding: 0;
+  border: 0;
+}
+
+.settings-fields legend {
+  margin-bottom: 1rem;
+  padding: 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.settings-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.settings-field label {
+  font-weight: 700;
+}
+
+.settings-field small {
+  color: var(--page-text-muted);
+}
+
+.settings-field input[type="range"] {
+  width: 100%;
+  min-height: 2rem;
+  accent-color: var(--btn-primary-bg);
+  cursor: pointer;
+}
+
+.settings-range-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+}
+
+.settings-field input[type="number"],
+.settings-field select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font: inherit;
+  color: var(--page-text);
+  background: var(--btn-secondary-bg);
+  border: 1.5px solid var(--surface-border);
+  border-radius: 12px;
+}
+
+.settings-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-height: 2rem;
+  cursor: pointer;
+}
+
+.settings-checkbox input {
+  width: 1.2rem;
+  height: 1.2rem;
+  margin: 0;
+  accent-color: var(--btn-primary-bg);
+}
+
+.settings-preview {
+  padding: 1rem;
+  border: 1px solid var(--surface-border);
+  border-radius: 12px;
+  background: var(--btn-secondary-bg);
+  overflow-wrap: anywhere;
+}
+
+.settings-preview h2 {
+  margin: 0 0 0.75rem;
+  font-size: 1rem;
+}
+
+.settings-preview p {
+  margin: 0;
+}
+
+.settings-fields :disabled {
+  cursor: not-allowed;
+}
+
+.settings-fields button:disabled {
+  opacity: 0.6;
+}
+
+.settings-field select option {
+  background-color: #ffffff;
+  color: var(--page-text);
+}
+
+[data-theme="dark"] .settings-field select option {
+  background-color: #292929;
+  color: #ffffff;
+}
+
+:root[data-contrast="high"] .settings-field select option {
+  background-color: #000000;
+  color: #ffffff;
+}
