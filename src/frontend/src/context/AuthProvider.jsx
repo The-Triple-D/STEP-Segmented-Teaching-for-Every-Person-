@@ -165,6 +165,7 @@ export default function AuthProvider({ children }) {
       isStudent: Boolean(user.isStudent),
       isInstructor: Boolean(user.isInstructor),
       isAdmin: Boolean(user.isAdmin),
+      ...(currentPassword ? { currentPassword } : {}),
       ...(newPassword ? { passwordHash: newPassword } : {}),
     }
 

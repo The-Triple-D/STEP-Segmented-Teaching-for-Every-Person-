@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 
 @Entity
 @Table(name = "users")
@@ -41,6 +42,17 @@ public class UserEntity {
 
     @Column(name = "is_admin", nullable = false)
     private Boolean isAdmin = false;
+
+    @Transient
+    private String currentPassword;
+
+    public String getCurrentPassword() {
+        return currentPassword;
+    }
+
+    public void setCurrentPassword(String currentPassword) {
+        this.currentPassword = currentPassword;
+    }
 
     public UserEntity() {}
 
