@@ -143,9 +143,23 @@ public class UserService {
         user.setIsStudent(details.getIsStudent());
         user.setIsInstructor(details.getIsInstructor());
         user.setIsAdmin(details.getIsAdmin());
+
         if (!isBlank(details.getPasswordHash())) {
+            if (isBlank(details.getCurrentPassword())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Current password is required to set a new password");
+            }
+            if (!details.getCurrentPassword().equals(user.getPasswordHash())) {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+                    "Current password is incorrect");
+            }
+            if (details.getPasswordHash().length() < 8) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "New password must be at least 8 characters");
+            }
             user.setPasswordHash(details.getPasswordHash());
         }
+
         return userRepository.save(user);
     }
 
