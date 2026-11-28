@@ -39,13 +39,23 @@ public class UserController {
 
     @PostMapping("/forgotPassword")
     public Map<String, String> forgotPassword(@RequestBody Map<String, String> request) {
-        String token = userService.requestPasswordReset(request.get("email"));
-        return Collections.singletonMap("token", token);
+        userService.requestPasswordReset(request.get("email"));
+        return Collections.singletonMap("message", "If that email is registered, a 6-digit verification code has been sent.");
+    }
+
+    @PostMapping("/verifyOtp")
+    public Map<String, String> verifyOtp(@RequestBody Map<String, String> request) {
+        userService.verifyOtp(request.get("email"), request.get("otp"));
+        return Collections.singletonMap("message", "Verification code confirmed.");
     }
 
     @PostMapping("/resetPassword")
     public Map<String, String> resetPassword(@RequestBody Map<String, String> request) {
-        userService.resetPassword(request.get("token"), request.get("newPassword"));
+        userService.resetPassword(
+            request.get("email"),
+            request.get("otp"),
+            request.get("newPassword")
+        );
         return Collections.singletonMap("message", "Password updated successfully.");
     }
 
