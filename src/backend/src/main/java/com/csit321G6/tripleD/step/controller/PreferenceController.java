@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.csit321G6.tripleD.step.entity.PreferenceEntity;
+import com.csit321G6.tripleD.step.entity.StudentEntity;
 import com.csit321G6.tripleD.step.service.PreferenceService;
 
 import java.util.List;
@@ -30,6 +31,11 @@ public class PreferenceController {
     @GetMapping("/api/students/{studentId}/preferences")
     public ResponseEntity<PreferenceEntity> getPreferencesByStudentId(@PathVariable String studentId) {
         return ResponseEntity.ok(preferenceService.getPreferenceByStudentId(studentId));
+    }
+
+    @GetMapping("/api/students/user/{userId}")
+    public ResponseEntity<StudentEntity> getStudentByUserId(@PathVariable String userId) {
+        return ResponseEntity.ok(preferenceService.getStudentByUserId(userId));
     }
 
     @PostMapping("/api/students/{studentId}/preferences")

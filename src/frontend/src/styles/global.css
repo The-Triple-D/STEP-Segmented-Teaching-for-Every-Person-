@@ -4,6 +4,7 @@
   --font-body: "Atkinson Hyperlegible", system-ui, "Segoe UI", sans-serif;
   --heading-transform: uppercase;
   --text-scale: 1;
+  --line-spacing: 1.5;
 
   --page-bg: radial-gradient(circle at 80% 25%, #e6dfff 0%, #f5f3ff 48%, #ebe6ff 100%);
   --page-text: #1b1438;
@@ -84,6 +85,7 @@ body {
   background: var(--page-bg);
   background-attachment: fixed;
   color: var(--page-text);
+  line-height: var(--line-spacing);
   transition: background 0.3s ease, color 0.3s ease;
 }
 
@@ -128,4 +130,58 @@ body {
     transition: none !important;
     animation: none !important;
   }
+}
+
+:root[data-line-spacing] :is(p, li, .player-card__text, .course-card__desc, .step-split-desc) {
+  line-height: var(--line-spacing);
+}
+
+html:root[data-contrast="high"] {
+  --page-bg: #000000;
+  --page-text: #ffffff;
+  --page-text-muted: #ffffff;
+  --text-accent: #ffff00;
+
+  --blob-color: #333333;
+  --surface-glass: #000000;
+  --surface-border: #ffffff;
+
+  --btn-primary-bg: #000080;
+  --btn-primary-hover: #0000b3;
+  --btn-primary-text: #ffffff;
+
+  --btn-secondary-bg: #000000;
+  --btn-secondary-hover: #333333;
+  --btn-secondary-text: #ffffff;
+  --btn-secondary-border: #ffffff;
+
+  --card-bg: #000000;
+  --card-text: #ffffff;
+  --auth-link: #ffff00;
+  --focus-ring: #ffff00;
+}
+
+:root[data-contrast="high"] .step-btn-primary {
+  border-color: #ffffff;
+}
+
+:root[data-contrast="high"] nav a {
+  color: #ffff00;
+}
+
+:root[data-contrast="high"] .course-card {
+  border: 1px solid #ffffff;
+}
+
+:root[data-low-stimulation="true"],
+:root[data-low-stimulation="true"] *,
+:root[data-low-stimulation="true"] *::before,
+:root[data-low-stimulation="true"] *::after {
+  animation: none !important;
+  transition: none !important;
+  scroll-behavior: auto !important;
+}
+
+:root[data-low-stimulation="true"] .course-card:hover {
+  transform: none;
 }

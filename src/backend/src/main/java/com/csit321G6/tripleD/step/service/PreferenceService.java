@@ -40,6 +40,10 @@ public class PreferenceService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Preferences not configured for student ID: " + studentId));
     }
 
+        public StudentEntity getStudentByUserId(String userId) {
+            return studentRepository.findByUser_Id(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Student not found with user ID: " + userId));
+    }
     public PreferenceEntity createPreference(String studentId, PreferenceEntity preference) {
         StudentEntity student = studentRepository.findById(studentId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Student not found with ID: " + studentId));
